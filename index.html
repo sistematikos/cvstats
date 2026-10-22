@@ -13,32 +13,32 @@
     <script src="security.js"></script>
 
     <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            },
-            colors: {
-              brand: {
-                50: '#f0f6ff',
-                100: '#e0edff',
-                500: '#0066ff',
-                600: '#0052cc',
-                700: '#003db3',
-                electric: '#0055FF',
-                cyan: '#00D2FF',
-                orange: '#FF5500',
-                dark: '#030B1E'
+        tailwind.config = {
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+              },
+              colors: {
+                brand: {
+                  50: '#f0f6ff',
+                  100: '#e0edff',
+                  500: '#0066ff',
+                  600: '#0052cc',
+                  700: '#003db3',
+                  electric: '#0055FF',
+                  cyan: '#00D2FF',
+                  orange: '#FF5500',
+                  dark: '#030B1E'
+                }
+              },
+              boxShadow: {
+                'electric': '0 10px 30px -5px rgba(0, 85, 255, 0.3)',
+                'glass': '0 20px 40px rgba(0, 31, 63, 0.05)',
               }
-            },
-            boxShadow: {
-              'electric': '0 10px 30px -5px rgba(0, 85, 255, 0.3)',
-              'glass': '0 20px 40px rgba(0, 31, 63, 0.05)',
             }
           }
         }
-      }
     </script>
     <style>
         body {
@@ -70,12 +70,12 @@
             return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
         }
 
-        // VALIDACIÓN DE SESIÓN: Solo redirige a stats si ya está validado Y ejecutándose como app instalada
+        // VALIDACIÓN DE SESIÓN AL CARGAR LA PÁGINA
         document.addEventListener('DOMContentLoaded', () => {
             const licenciaValidada = localStorage.getItem('licencia_validada');
             const empresaID = localStorage.getItem('youcontrol_empresa_id');
 
-            if (licenciaValidada === 'true' && empresaID && esPWAInstalada()) {
+            if (licenciaValidada === 'true' && empresaID) {
                 window.location.replace('./index_stats.html');
             }
         });
@@ -192,21 +192,13 @@
                 localStorage.setItem('licencia_validada', 'true');
 
                 statusDiv.className = "text-xs font-bold text-emerald-600";
-                statusDiv.innerText = "¡Licencia válida! Iniciando instalación...";
+                statusDiv.innerText = "¡Licencia válida! Redirigiendo...";
 
                 if (window.deferredPrompt) {
                     window.deferredPrompt.prompt();
                     const userChoice = await window.deferredPrompt.userChoice;
                     window.deferredPrompt = null;
-
-                    if (userChoice.outcome === 'accepted') {
-                        window.location.replace('./index_stats.html');
-                    } else {
-                        alert("Es necesario instalar la aplicación para ingresar.");
-                        btn.disabled = false;
-                        btn.innerHTML = `<i class="fas fa-download text-sm"></i> Instalar Módulo y Comenzar`;
-                        statusDiv.innerText = "";
-                    }
+                    window.location.replace('./index_stats.html');
                 } else {
                     window.location.replace('./index_stats.html');
                 }
