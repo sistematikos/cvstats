@@ -9,36 +9,46 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- SCRIPT DE SEGURIDAD Y BLOQUEO -->
+    <!-- SCRIPT DE SEGURIDAD Y BLOQUEO (Ruta ajustada a la raíz) -->
     <script src="security.js"></script>
 
     <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            },
-            colors: {
-              brand: {
-                50: '#f0f6ff',
-                100: '#e0edff',
-                500: '#0066ff',
-                600: '#0052cc',
-                700: '#003db3',
-                electric: '#0055FF',
-                cyan: '#00D2FF',
-                orange: '#FF5500',
-                dark: '#030B1E'
+        // --- VALIDACIÓN AUTOMÁTICA AL CARGAR PARA REDIRIGIR A INDEX_STATS.HTML ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const licenciaValidada = localStorage.getItem('licencia_validada');
+            const empresaID = localStorage.getItem('youcontrol_empresa_id');
+
+            if (licenciaValidada === 'true' && empresaID) {
+                window.location.replace('./index_stats.html');
+            }
+        });
+
+        tailwind.config = {
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+              },
+              colors: {
+                brand: {
+                  50: '#f0f6ff',
+                  100: '#e0edff',
+                  500: '#0066ff',
+                  600: '#0052cc',
+                  700: '#003db3',
+                  electric: '#0055FF',
+                  cyan: '#00D2FF',
+                  orange: '#FF5500',
+                  dark: '#030B1E'
+                }
+              },
+              boxShadow: {
+                'electric': '0 10px 30px -5px rgba(0, 85, 255, 0.3)',
+                'glass': '0 20px 40px rgba(0, 31, 63, 0.05)',
               }
-            },
-            boxShadow: {
-              'electric': '0 10px 30px -5px rgba(0, 85, 255, 0.3)',
-              'glass': '0 20px 40px rgba(0, 31, 63, 0.05)',
             }
           }
         }
-      }
     </script>
     <style>
         body {
@@ -100,7 +110,7 @@
 
         <!-- ÚNICO BOTÓN DE INSTALACIÓN Y ACTIVACIÓN -->
         <button id="btnActivarEInstalar" class="w-full py-4 px-4 bg-brand-electric hover:bg-brand-600 text-white font-black rounded-xl shadow-electric transition text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer">
-            <i class="fas.fa-download text-sm"></i> Activar y Comenzar Módulo
+            <i class="fas fa-download text-sm"></i> Activar y Comenzar Módulo
         </button>
 
         <div id="statusMsg" class="text-xs font-bold text-slate-500"></div>
