@@ -60,7 +60,7 @@
 
     <!-- HEADER / CABECERA -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-electric to-brand-cyan flex items-center justify-center text-white shadow-electric">
                     <i class="fas fa-volleyball text-lg"></i>
@@ -75,185 +75,183 @@
 
             <div class="flex items-center gap-2">
                 <button id="btnExportarPdf" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
-                    <i class="fas fa-print"><span>Imprimir / PDF</span></i>
+                    <i class="fas fa-print"></i> <span>PDF</span>
                 </button>
                 <button id="ra" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-rose-200">
-                    <i class="fas fa-trash-alt"></i> <span>Reiniciar Todo</span>
+                    <i class="fas fa-trash-alt"></i> <span>Reset</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="max-w-7xl mx-auto px-4 mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- CONTENIDO PRINCIPAL REORGANIZADO -->
+    <main class="max-w-4xl mx-auto px-4 mt-6 space-y-6">
 
-        <!-- COLUMNA IZQUIERDA: ROSTER Y REGISTRO TÁCTIL (Cols 1 a 7) -->
-        <div class="lg:col-span-7 space-y-6">
-
-            <!-- PASO 1: SELECCIÓN DE ATLETAS / ROSTER -->
-            <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
-                        <span class="w-5 h-5 rounded-lg bg-brand-50 text-brand-electric flex items-center justify-center text-[10px] font-black border border-brand-electric/20">1</span>
-                        Roster del Partido (<span id="countRoster">0</span> atletas)
-                    </h2>
-                    <span id="atletaSeleccionadoBadge" class="hidden px-2.5 py-1 rounded-xl bg-brand-50 text-brand-electric text-xs font-black border border-brand-electric/30 animate-pulse">
-                        Activo: <span id="nombreAtletaSel">Ninguno</span>
-                    </span>
-                </div>
-
-                <!-- Controles para agregar atletas -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class="flex gap-2">
-                        <select id="selectNomina" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-brand-electric">
-                            <option value="">Seleccione de Nómina...</option>
-                        </select>
-                        <button id="btnAgregarNomina" class="px-4 py-2.5 bg-brand-electric hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-electric transition">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="number" id="manualNum" placeholder="#" class="w-16 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-center font-bold outline-none focus:ring-2 focus:ring-brand-electric">
-                        <input type="text" id="manualNom" placeholder="Nombre Invitado" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-brand-electric">
-                        <button id="btnAgregarManual" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs transition">
-                            <i class="fas fa-user-plus"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Grid de tarjetas de atletas en el roster -->
-                <div id="rosterCardsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-h-48 overflow-y-auto p-1">
-                    <!-- Las tarjetas se generan dinámicamente -->
-                </div>
+        <!-- 1. TARJETA DE FECHA Y EQUIPOS -->
+        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-3">
+            <div class="flex justify-between items-center text-xs font-bold text-slate-500">
+                <span id="fechaJuegoDisplay">--/--/----</span>
+                <span class="text-brand-electric font-black uppercase flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-brand-electric animate-ping"></span> Partido en Vivo
+                </span>
             </div>
-
-            <!-- PASO 2: BOTONERA DE ACCIONES TÁCTILES -->
-            <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
-                        <span class="w-5 h-5 rounded-lg bg-brand-50 text-brand-electric flex items-center justify-center text-[10px] font-black border border-brand-electric/20">2</span>
-                        Registro Táctil de Acciones
-                    </h2>
-                    <button id="btnDeshacer" class="text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition flex items-center gap-1">
-                        <i class="fas fa-undo text-[10px]"></i> Deshacer Última
-                    </button>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Equipo Local</label>
+                    <input type="text" id="equipoLocal" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black text-slate-900 outline-none focus:ring-2 focus:ring-brand-electric">
                 </div>
-
-                <!-- Botones por Fundamento (Positivo / Error) -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <!-- Servicio -->
-                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
-                        <span class="text-[11px] font-black uppercase text-slate-700 text-center">Servicio</span>
-                        <div class="grid grid-cols-2 gap-1.5">
-                            <button onclick="window.registrarAccionDirecta('Servicio#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Punto (#)</button>
-                            <button onclick="window.registrarAccionDirecta('Servicio=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Error (=)</button>
-                        </div>
-                    </div>
-                    <!-- Ataque -->
-                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
-                        <span class="text-[11px] font-black uppercase text-slate-700 text-center">Ataque</span>
-                        <div class="grid grid-cols-2 gap-1.5">
-                            <button onclick="window.registrarAccionDirecta('Ataque#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Punto (#)</button>
-                            <button onclick="window.registrarAccionDirecta('Ataque=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Error (=)</button>
-                        </div>
-                    </div>
-                    <!-- Bloqueo -->
-                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
-                        <span class="text-[11px] font-black uppercase text-slate-700 text-center">Bloqueo</span>
-                        <div class="grid grid-cols-2 gap-1.5">
-                            <button onclick="window.registrarAccionDirecta('Bloqueo#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Punto (#)</button>
-                            <button onclick="window.registrarAccionDirecta('Bloqueo=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Error (=)</button>
-                        </div>
-                    </div>
-                    <!-- Coloque -->
-                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
-                        <span class="text-[11px] font-black uppercase text-slate-700 text-center">Coloque</span>
-                        <div class="grid grid-cols-2 gap-1.5">
-                            <button onclick="window.registrarAccionDirecta('Coloque#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Punto (#)</button>
-                            <button onclick="window.registrarAccionDirecta('Coloque=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Error (=)</button>
-                        </div>
-                    </div>
-                    <!-- Recepción -->
-                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
-                        <span class="text-[11px] font-black uppercase text-slate-700 text-center">Recepción</span>
-                        <div class="grid grid-cols-2 gap-1.5">
-                            <button onclick="window.registrarAccionDirecta('Recepción#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Bien (#)</button>
-                            <button onclick="window.registrarAccionDirecta('Recepción=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Mal (=)</button>
-                        </div>
-                    </div>
-                    <!-- Defensa -->
-                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
-                        <span class="text-[11px] font-black uppercase text-slate-700 text-center">Defensa</span>
-                        <div class="grid grid-cols-2 gap-1.5">
-                            <button onclick="window.registrarAccionDirecta('Defensa#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Bien (#)</button>
-                            <button onclick="window.registrarAccionDirecta('Defensa=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Mal (=)</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Controles de Sets y Partido -->
-                <div class="flex gap-2 pt-2">
-                    <button id="rs" class="w-1/2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black rounded-xl text-xs uppercase tracking-wider transition">
-                        <i class="fas fa-flag-checkered mr-1"></i> Culminar Set Actual
-                    </button>
-                    <button id="btnCulminarPartido" class="w-1/2 py-3 bg-slate-800 hover:bg-slate-900 text-white font-black rounded-xl text-xs uppercase tracking-wider transition">
-                        <i class="fas fa-trophy mr-1 text-amber-400"></i> Culminar Partido
-                    </button>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Equipo Rival</label>
+                    <input type="text" id="equipoRival" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black text-slate-900 outline-none focus:ring-2 focus:ring-brand-electric">
                 </div>
             </div>
         </div>
 
-        <!-- COLUMNA DERECHA: ESTADÍSTICAS Y GRÁFICOS (Cols 8 a 12) -->
-        <div class="lg:col-span-5 space-y-6">
-
-            <!-- INFORMACIÓN DEL PARTIDO -->
-            <div class="glass-card p-5 rounded-3xl shadow-glass space-y-3">
-                <div class="flex justify-between items-center text-xs font-bold text-slate-500">
-                    <span id="fechaJuegoDisplay">--/--/----</span>
-                    <span class="text-brand-electric font-black uppercase">En Vivo</span>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Equipo Local</label>
-                        <input type="text" id="equipoLocal" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black text-slate-900 outline-none focus:ring-2 focus:ring-brand-electric">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Equipo Rival</label>
-                        <input type="text" id="equipoRival" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black text-slate-900 outline-none focus:ring-2 focus:ring-brand-electric">
-                    </div>
-                </div>
-            </div>
-
-            <!-- CUADRO DE HONOR (MVP / RECONOCIMIENTOS) -->
-            <div class="glass-card p-5 rounded-3xl shadow-glass space-y-3">
+        <!-- 2. TARJETA DE INGRESO Y ROSTER DE ATLETAS -->
+        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4">
+            <div class="flex justify-between items-center">
                 <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
-                    <i class="fas fa-award text-amber-500 text-sm"></i> Cuadro de Honor
+                    <span class="w-5 h-5 rounded-lg bg-brand-50 text-brand-electric flex items-center justify-center text-[10px] font-black border border-brand-electric/20">1</span>
+                    Roster de Atletas (<span id="countRoster">0</span>)
                 </h2>
-                <div id="cuadroHonorGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <!-- Se llena dinámicamente -->
+                <span id="atletaSeleccionadoBadge" class="hidden px-2.5 py-1 rounded-xl bg-brand-50 text-brand-electric text-xs font-black border border-brand-electric/30 animate-pulse">
+                    Activo: <span id="nombreAtletaSel">Ninguno</span>
+                </span>
+            </div>
+
+            <!-- Formularios de adición -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="flex gap-2">
+                    <select id="selectNomina" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-brand-electric">
+                        <option value="">Seleccione de Nómina...</option>
+                    </select>
+                    <button id="btnAgregarNomina" class="px-4 py-2.5 bg-brand-electric hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-electric transition">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="flex gap-2">
+                    <input type="number" id="manualNum" placeholder="#" class="w-16 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-center font-bold outline-none focus:ring-2 focus:ring-brand-electric">
+                    <input type="text" id="manualNom" placeholder="Nombre Invitado" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-brand-electric">
+                    <button id="btnAgregarManual" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs transition">
+                        <i class="fas fa-user-plus"></i>
+                    </button>
                 </div>
             </div>
 
-            <!-- RESUMEN EN TIEMPO REAL -->
-            <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
-                        <i class="fas fa-chart-bar text-brand-electric"></i> Estadísticas por Atleta
-                    </h2>
+            <!-- Grid de tarjetas de jugadores -->
+            <div id="rosterCardsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-h-48 overflow-y-auto p-1">
+                <!-- Se poblará dinámicamente -->
+            </div>
+        </div>
+
+        <!-- 3. TARJETA DE REGISTRO TÁCTIL DE ACCIONES -->
+        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-lg bg-brand-50 text-brand-electric flex items-center justify-center text-[10px] font-black border border-brand-electric/20">2</span>
+                    Acciones Táctiles
+                </h2>
+                <button id="btnDeshacer" class="text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition flex items-center gap-1">
+                    <i class="fas fa-undo text-[10px]"></i> Deshacer Última
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <!-- Servicio -->
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
+                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Servicio</span>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button onclick="window.registrarAccionDirecta('Servicio#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Punto (#)</button>
+                        <button onclick="window.registrarAccionDirecta('Servicio=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Error (=)</button>
+                    </div>
                 </div>
-                <div id="st" class="space-y-2 max-h-60 overflow-y-auto pr-1">
-                    <!-- Acciones individuales por jugador -->
+                <!-- Ataque -->
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
+                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Ataque</span>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button onclick="window.registrarAccionDirecta('Ataque#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Punto (#)</button>
+                        <button onclick="window.registrarAccionDirecta('Ataque=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Error (=)</button>
+                    </div>
+                </div>
+                <!-- Bloqueo -->
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
+                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Bloqueo</span>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button onclick="window.registrarAccionDirecta('Bloqueo#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Punto (#)</button>
+                        <button onclick="window.registrarAccionDirecta('Bloqueo=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Error (=)</button>
+                    </div>
+                </div>
+                <!-- Coloque -->
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
+                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Coloque</span>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button onclick="window.registrarAccionDirecta('Coloque#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Punto (#)</button>
+                        <button onclick="window.registrarAccionDirecta('Coloque=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Error (=)</button>
+                    </div>
+                </div>
+                <!-- Recepción -->
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
+                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Recepción</span>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button onclick="window.registrarAccionDirecta('Recepción#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Bien (#)</button>
+                        <button onclick="window.registrarAccionDirecta('Recepción=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Mal (=)</button>
+                    </div>
+                </div>
+                <!-- Defensa -->
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
+                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Defensa</span>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button onclick="window.registrarAccionDirecta('Defensa#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Bien (#)</button>
+                        <button onclick="window.registrarAccionDirecta('Defensa=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Mal (=)</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- GRÁFICOS ANALÍTICOS -->
-            <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4">
-                <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider">Rendimiento Gráfico</h2>
-                <div id="sum" class="text-xs font-bold text-slate-600 text-center"></div>
-                <div class="h-48 relative"><canvas id="c1"></canvas></div>
-                <div class="h-48 relative pt-2 border-t border-slate-100"><canvas id="c2"></canvas></div>
+            <!-- Cierre de Sets / Partidos -->
+            <div class="flex gap-2 pt-2">
+                <button id="rs" class="w-1/2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black rounded-xl text-xs uppercase tracking-wider transition">
+                    <i class="fas fa-flag-checkered mr-1"></i> Culminar Set Actual
+                </button>
+                <button id="btnCulminarPartido" class="w-1/2 py-3 bg-slate-800 hover:bg-slate-900 text-white font-black rounded-xl text-xs uppercase tracking-wider transition">
+                    <i class="fas fa-trophy mr-1 text-amber-400"></i> Culminar Partido
+                </button>
             </div>
+        </div>
 
+        <!-- 4. TARJETA DE RESUMEN POR ATLETA -->
+        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4">
+            <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
+                <i class="fas fa-users text-brand-electric"></i> Resumen Estadístico por Atleta
+            </h2>
+            <div id="st" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                <!-- Se poblará dinámicamente -->
+            </div>
+        </div>
+
+        <!-- 5. TARJETA DE GRÁFICAS ANALÍTICAS -->
+        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4">
+            <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
+                <i class="fas fa-chart-bar text-brand-electric"></i> Gráficas de Rendimiento
+            </h2>
+            <div id="sum" class="text-xs font-bold text-slate-600 text-center"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="h-56 relative bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <canvas id="c1"></canvas>
+                </div>
+                <div class="h-56 relative bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <canvas id="c2"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. TARJETA DE RECONOCIMIENTOS / CUADRO DE HONOR -->
+        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-3">
+            <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
+                <i class="fas fa-award text-amber-500 text-sm"></i> Cuadro de Honor (Mejores Jugadores)
+            </h2>
+            <div id="cuadroHonorGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <!-- Se poblará dinámicamente con MVP y All-Stars -->
+            </div>
         </div>
 
     </main>
