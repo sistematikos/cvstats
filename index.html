@@ -66,12 +66,16 @@
             window.deferredPrompt = e;
         });
 
-        // VERIFICACIÓN AUTOMÁTICA DE SESIÓN AL CARGAR
+        function esPWAInstalada() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        }
+
+        // REDIRECCIÓN AUTOMÁTICA SOLO SI YA ESTÁ INSTALADA Y TIENE LICENCIA
         document.addEventListener('DOMContentLoaded', () => {
             const licenciaValidada = localStorage.getItem('licencia_validada');
             const empresaID = localStorage.getItem('youcontrol_empresa_id');
 
-            if (licenciaValidada === 'true' && empresaID) {
+            if (licenciaValidada === 'true' && empresaID && esPWAInstalada()) {
                 window.location.replace('index_stats.html');
             }
         });
@@ -187,17 +191,42 @@
                 localStorage.setItem('youcontrol_empresa_id', activationId);
                 localStorage.setItem('licencia_validada', 'true');
 
-                statusDiv.className = "text-xs font-bold text-emerald-600";
-                statusDiv.innerText = "¡Licencia válida! Redirigiendo...";
-
-                // DISPARAR PWA PROMPT O REDIRIGIR
+                // CONTROL DE INSTALACIÓN OBLIGATORIA
                 if (window.deferredPrompt) {
+                    statusDiv.className = "text-xs font-bold text-amber-600";
+                    statusDiv.innerText = "Confirmando instalación de la App...";
+
                     window.deferredPrompt.prompt();
-                    await window.deferredPrompt.userChoice;
+                    const userChoice = await window.deferredPrompt.userChoice;
                     window.deferredPrompt = null;
+
+                    if (userChoice.outcome === 'accepted') {
+                        statusDiv.className = "text-xs font-bold text-emerald-600";
+                        statusDiv.innerText = "¡Aplicación instalada con éxito! Redirigiendo...";
+                        setTimeout(() => {
+                            window.location.replace('index_stats.html');
+                        }, 500);
+                    } else {
+                        // SI CANCELA LA INSTALACIÓN
+                        alert("Instalación obligatoria: Debes confirmar la instalación de la App para ingresar al módulo Stats.");
+                        btn.disabled = false;
+                        btn.innerHTML = `<i class="fas fa-download text-sm"></i> Instalar Módulo y Comenzar`;
+                        statusDiv.className = "text-xs font-bold text-rose-600";
+                        statusDiv.innerText = "Instalación cancelada. Debes instalar la App para ingresar.";
+                    }
+                } else if (esPWAInstalada()) {
+                    statusDiv.className = "text-xs font-bold text-emerald-600";
+                    statusDiv.innerText = "Licencia válida. Ingresando...";
+                    setTimeout(() => {
+                        window.location.replace('index_stats.html');
+                    }, 500);
+                } else {
+                    alert("Para ingresar debes instalar esta aplicación. Usa la opción 'Añadir a la pantalla de inicio' o 'Instalar aplicación' desde el menú de tu navegador.");
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fas fa-download text-sm"></i> Instalar Módulo y Comenzar`;
+                    statusDiv.className = "text-xs font-bold text-rose-600";
+                    statusDiv.innerText = "Instala la app desde el menú de tu navegador para continuar.";
                 }
-                
-                window.location.replace('index_stats.html');
                 
             } catch (e) {
                 console.error("Error al procesar activación:", e);
