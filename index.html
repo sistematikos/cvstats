@@ -66,17 +66,13 @@
             window.deferredPrompt = e;
         });
 
-        function esPWAInstalada() {
-            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-        }
-
-        // VALIDACIÓN DE SESIÓN AL CARGAR LA PÁGINA
+        // VERIFICACIÓN AUTOMÁTICA DE SESIÓN AL CARGAR
         document.addEventListener('DOMContentLoaded', () => {
             const licenciaValidada = localStorage.getItem('licencia_validada');
             const empresaID = localStorage.getItem('youcontrol_empresa_id');
 
             if (licenciaValidada === 'true' && empresaID) {
-                window.location.replace('./index_stats.html');
+                window.location.replace('index_stats.html');
             }
         });
 
@@ -194,14 +190,14 @@
                 statusDiv.className = "text-xs font-bold text-emerald-600";
                 statusDiv.innerText = "¡Licencia válida! Redirigiendo...";
 
+                // DISPARAR PWA PROMPT O REDIRIGIR
                 if (window.deferredPrompt) {
                     window.deferredPrompt.prompt();
-                    const userChoice = await window.deferredPrompt.userChoice;
+                    await window.deferredPrompt.userChoice;
                     window.deferredPrompt = null;
-                    window.location.replace('./index_stats.html');
-                } else {
-                    window.location.replace('./index_stats.html');
                 }
+                
+                window.location.replace('index_stats.html');
                 
             } catch (e) {
                 console.error("Error al procesar activación:", e);
