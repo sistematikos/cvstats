@@ -1,0 +1,141 @@
+body { 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    background-color: #F8FAFC; 
+    color: #0F172A;
+    user-select: none; 
+}
+
+.bg-sports-pattern {
+    background-color: #F8FAFC;
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(0, 85, 255, 0.04) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(249, 115, 22, 0.04) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(241, 245, 249, 0.8) 0px, transparent 100%);
+}
+
+.glass-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 10px 30px -5px rgba(0, 31, 63, 0.05);
+}
+
+.banner-glow { 
+    position: relative; 
+}
+
+.banner-glow::after {
+    content: '';
+    position: absolute;
+    bottom: -15px; 
+    left: 5%; 
+    width: 90%; 
+    height: 30px;
+    background: linear-gradient(90deg, #0055FF, #FF5500);
+    filter: blur(20px); 
+    opacity: 0.25; 
+    z-index: -1; 
+    border-radius: 50%;
+}
+
+.card-atleta-item {
+    background-color: #FFFFFF;
+    border: 1.5px solid #E2E8F0;
+    transition: all 0.2s ease-in-out;
+}
+
+.card-atleta-item:hover {
+    border-color: #0055FF;
+    transform: translateY(-2px);
+}
+
+.card-atleta-selected {
+    border-color: #0055FF !important;
+    background-color: #EFF6FF !important;
+    box-shadow: 0 0 18px rgba(0, 85, 255, 0.25) !important;
+    transform: translateY(-2px) scale(1.02);
+}
+
+.btn-action-pos {
+    background-color: #E0EDFF !important;
+    border: 1.5px solid #BFDBFE !important;
+    color: #0040C0 !important;
+    box-shadow: 0 2px 8px rgba(0, 85, 255, 0.08);
+    transition: all 0.15s ease;
+}
+
+.btn-action-pos:hover {
+    background-color: #D0E3FF !important;
+    border-color: #93C5FD !important;
+    transform: translateY(-1px);
+}
+
+.btn-action-pos:active {
+    transform: scale(0.96);
+    background-color: #B2D4FF !important;
+}
+
+.btn-action-neg {
+    background-color: #FFEDD5 !important;
+    border: 1.5px solid #FED7AA !important;
+    color: #C2410C !important;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.08);
+    transition: all 0.15s ease;
+}
+
+.btn-action-neg:hover {
+    background-color: #FFE4E6 !important;
+    border-color: #FDBA74 !important;
+    transform: translateY(-1px);
+}
+
+.btn-action-neg:active {
+    transform: scale(0.96);
+    background-color: #FDBA74 !important;
+}
+
+.btn-ctrl-red {
+    background-color: #E11D48 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+}
+
+.btn-ctrl-red:hover {
+    background-color: #BE123C !important;
+}
+
+.btn-ctrl-blue {
+    background-color: #0284C7 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+.btn-ctrl-blue:hover {
+    background-color: #0369A1 !important;
+}
+
+input::-webkit-inner-spin-button, 
+input::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+
+/* ==========================================
+   CONFIGURACIÓN PARA EXPORTAR A PDF / IMPRESIÓN
+   ========================================== */
+@media print {
+    body {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+        padding: 0 !important;
+    }
+    .print\:hidden {
+        display: none !important;
+    }
+    .glass-card {
+        background: #FFFFFF !important;
+        border: 1px solid #CBD5E1 !important;
+        box-shadow: none !important;
+        break-inside: avoid;
+        margin-bottom: 15px;
+    }
+}
