@@ -22,16 +22,19 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
-// 2. Bloqueo total del Clic Derecho
+// 2. Bloqueo total del Clic Derecho (excepto en inputs de texto/textareas para permitir copiar/pegar licencias)
 document.addEventListener('contextmenu', event => {
+    if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+        return true; // Permite menú contextual en campos de texto para facilitar el pegado
+    }
     event.preventDefault();
     return false;
 });
 
-// 3. Validación de sesión activa complementaria (Excluyendo el index.html de activación)
+// 3. Validación de sesión activa (Excluyendo la pantalla principal de activación)
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
-    // Si estamos en la raíz o en el index.html principal, no aplicamos el bloqueo de sesión para permitir la activación
+    // Si estamos en la raíz o en el index.html principal, permitimos la activación
     if (path.endsWith('/') || path.endsWith('index.html')) {
         return;
     }
@@ -40,6 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const supaUrl = localStorage.getItem('control_voley_supa_url');
     
     if (!empresaID || !supaUrl) {
-        window.location.href = 'index.html';
+        window.location.replace('index.html');
     }
 });
