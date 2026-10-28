@@ -9,27 +9,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- SCRIPT DE SEGURIDAD Y BLOQUEO -->
+    <!-- ESCUDO DE SEGURIDAD GLOBAL -->
     <script src="security.js"></script>
 
     <script>
         tailwind.config = {
           theme: {
             extend: {
-              fontFamily: {
-                sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-              },
+              fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
               colors: {
                 brand: {
-                  50: '#f0f6ff',
-                  100: '#e0edff',
-                  500: '#0066ff',
-                  600: '#0052cc',
-                  700: '#003db3',
-                  electric: '#0055FF',
-                  cyan: '#00D2FF',
-                  orange: '#FF5500',
-                  dark: '#030B1E'
+                  50: '#f0f6ff', 100: '#e0edff', 500: '#0066ff', 600: '#0052cc', 700: '#003db3',
+                  electric: '#0055FF', cyan: '#00D2FF', orange: '#FF5500', dark: '#030B1E'
                 }
               },
               boxShadow: {
@@ -41,10 +32,7 @@
         }
     </script>
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #F8FAFC;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; }
         .bg-sports-pattern {
             background-color: #F1F5F9;
             background-image: 
@@ -52,11 +40,7 @@
                 radial-gradient(at 100% 100%, rgba(0, 210, 255, 0.08) 0px, transparent 50%),
                 radial-gradient(at 50% 50%, rgba(241, 245, 249, 0.5) 0px, transparent 100%);
         }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-        }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.8); }
     </style>
 
     <script>
@@ -70,7 +54,6 @@
             return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
         }
 
-        // REDIRECCIÓN AUTOMÁTICA SOLO SI YA ESTÁ INSTALADA Y TIENE LICENCIA
         document.addEventListener('DOMContentLoaded', () => {
             const licenciaValidada = localStorage.getItem('licencia_validada');
             const empresaID = localStorage.getItem('youcontrol_empresa_id');
@@ -87,7 +70,7 @@
         }
     </script>
 </head>
-<body class="bg-sports-pattern min-h-screen flex items-center justify-center p-4 antialiased text-slate-800" oncontextmenu="return false">
+<body class="bg-sports-pattern min-h-screen flex items-center justify-center p-4 antialiased text-slate-800">
 
     <div class="glass-card p-8 rounded-3xl shadow-glass border border-slate-200/80 w-full max-w-md text-center space-y-6">
         
@@ -101,18 +84,22 @@
         </div>
 
         <div class="text-left space-y-2">
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">Pega tu código de licencia:</label>
+            <div class="flex justify-between items-center">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">Pega tu código de licencia:</label>
+                <!-- BOTÓN INTELIGENTE PARA PEGADO MÓVIL -->
+                <button type="button" id="btnPegarPortapapeles" class="text-[11px] font-bold text-brand-electric hover:underline flex items-center gap-1 cursor-pointer">
+                    <i class="fas fa-paste"></i> Pegar automático
+                </button>
+            </div>
             <textarea id="tokenInput" placeholder="Pega el código aquí..." class="w-full h-28 p-3.5 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-700 outline-none focus:ring-2 focus:ring-brand-electric shadow-sm resize-none"></textarea>
         </div>
 
-        <!-- MENSAJE DE BIENVENIDA -->
         <div class="bg-brand-50 border border-brand-electric/20 rounded-2xl p-4 text-center">
             <p class="text-xs font-bold text-slate-700 leading-relaxed">
                 Sistema exclusivo y protegido. Valida tu licencia e instala la aplicación para iniciar el módulo de <strong class="text-brand-electric uppercase">Stats</strong>.
             </p>
         </div>
 
-        <!-- ÚNICO BOTÓN DE INSTALACIÓN Y ACTIVACIÓN -->
         <button id="btnActivarEInstalar" class="w-full py-4 px-4 bg-brand-electric hover:bg-brand-600 text-white font-black rounded-xl shadow-electric transition text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer">
             <i class="fas fa-download text-sm"></i> Instalar Módulo y Comenzar
         </button>
@@ -124,6 +111,7 @@
         </div>
     </div>
 
+    <!-- MÓDULO DE VALIDACIÓN Y SUPABASE -->
     <script type="module">
         import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -132,6 +120,22 @@
 
         const supabaseMaster = createClient(MASTER_SUPA_URL, MASTER_SUPA_KEY);
         const getHardwareID = () => btoa(navigator.userAgent + navigator.language);
+
+        // Lógica de pegado rápido
+        document.getElementById('btnPegarPortapapeles').addEventListener('click', async () => {
+            try {
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    const textoCopiado = await navigator.clipboard.readText();
+                    document.getElementById('tokenInput').value = textoCopiado.trim();
+                    document.getElementById('statusMsg').className = "text-xs font-bold text-emerald-600";
+                    document.getElementById('statusMsg').innerText = "¡Código pegado con éxito!";
+                } else {
+                    alert("Tu navegador no permite lectura automática. Mantén presionado el cuadro de texto.");
+                }
+            } catch (err) {
+                alert("No se pudo acceder al portapapeles. Mantén presionado el recuadro para pegar tu código.");
+            }
+        });
 
         async function procesarActivacionEInstalacion() {
             const rawToken = document.getElementById('tokenInput').value.trim();
@@ -191,7 +195,6 @@
                 localStorage.setItem('youcontrol_empresa_id', activationId);
                 localStorage.setItem('licencia_validada', 'true');
 
-                // CONTROL DE INSTALACIÓN OBLIGATORIA
                 if (window.deferredPrompt) {
                     statusDiv.className = "text-xs font-bold text-amber-600";
                     statusDiv.innerText = "Confirmando instalación de la App...";
@@ -207,7 +210,6 @@
                             window.location.replace('index_stats.html');
                         }, 500);
                     } else {
-                        // SI CANCELA LA INSTALACIÓN
                         alert("Instalación obligatoria: Debes confirmar la instalación de la App para ingresar al módulo Stats.");
                         btn.disabled = false;
                         btn.innerHTML = `<i class="fas fa-download text-sm"></i> Instalar Módulo y Comenzar`;
