@@ -37,10 +37,19 @@
             'Bloqueo#': 1,   'Bloqueo=': -1,
             'Coloque#': 1,   'Coloque=': -1,
             'Recepción#': 1, 'Recepción=': -1,
-            'Defensa#': 1,   'Defensa=': -1
+            'Defensa#': 1,   'Defensa=': -1,
+            'Armada+': 1,    'Armada-': -1
         };
 
-        const O = { Servicio: 'Servicio', Ataque: 'Ataque', Bloqueo: 'Bloqueo', Coloque: 'Coloque', Recepción: 'Recepción', Defensa: 'Defensa' };
+        const O = { 
+            Servicio: 'Servicio', 
+            Ataque: 'Ataque', 
+            Bloqueo: 'Bloqueo', 
+            Coloque: 'Coloque', 
+            Recepción: 'Recepción', 
+            Defensa: 'Defensa',
+            Armada: 'Armada'
+        };
         const P = { b: '#0055FF', r: '#dc2626', o: '#FF5500', g: '#10b981' };
         const K = { scales: { y: { ticks: { stepSize: 1 } } }, responsive: true, maintainAspectRatio: false };
 
@@ -61,7 +70,8 @@
             }, 2000);
         }
 
-        function poblaryNominaSelect() {
+        // Corrección del nombre de la función unificada
+        function poblarNominaSelect() {
             const select = _('selectNomina');
             if (!select) return;
             select.innerHTML = '<option value="">Seleccione de Nómina...</option>';
@@ -162,7 +172,7 @@
                 let k = d[l.playerKey];
                 if (k) {
                     let v = N[l.action];
-                    let t = l.action.replace(/[#=]/g, '');
+                    let t = l.action.replace(/[#=\+\-]/g, '');
                     
                     if (v > 0) k.p++; else k.n++;
                     k.total++;
@@ -205,17 +215,17 @@
             const c2El = _('c2');
             if (c1El && c2El) {
                 const x1 = c1El.getContext('2d'), x2 = c2El.getContext('2d'), l = Object.values(O);
-                let v1 = { p: [0,0,0,0,0,0], n: [0,0,0,0,0,0] }, v2 = { p: [0,0,0,0,0,0], n: [0,0,0,0,0,0] }, tp = 0, tn = 0;
+                let v1 = { p: [0,0,0,0,0,0,0], n: [0,0,0,0,0,0,0] }, v2 = { p: [0,0,0,0,0,0,0], n: [0,0,0,0,0,0,0] }, tp = 0, tn = 0;
 
                 const keys = Object.keys(O);
                 keys.forEach((k, idx) => {
                     let p = 0, n = 0, ap = 0, an = 0;
                     S.forEach(z => { 
-                        let t = z.action.replace(/[#=]/g, '');
+                        let t = z.action.replace(/[#=\+\-]/g, '');
                         if (t === k) N[z.action] > 0 ? p++ : n++; 
                     });
                     M.forEach(z => { 
-                        let t = z.action.replace(/[#=]/g, '');
+                        let t = z.action.replace(/[#=\+\-]/g, '');
                         if (t === k) {
                             if (N[z.action] > 0) { ap++; tp++; } else { an++; tn++; }
                         }
@@ -445,7 +455,7 @@
             try {
                 const { data: atletas } = await supabase.from('atletas').select('*').order('nroCamiseta', { ascending: true });
                 L_Nomina = atletas || [];
-                poblaryNominaSelect();
+                poblarNominaSelect(); // <-- Llamada corregida correctamente
             } catch (err) {
                 console.error("Error al cargar atletas:", err);
             }
