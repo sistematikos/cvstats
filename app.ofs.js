@@ -6,6 +6,24 @@ const MASTER_SUPA_KEY = "sb_publishable_aVydbrj88elb7XVq1yopFw_2U4MHgHv";
 const supabaseMaster = createClient(MASTER_SUPA_URL, MASTER_SUPA_KEY);
 const getHardwareID = () => btoa(navigator.userAgent + navigator.language);
 
+// Detección automática de iOS/Safari para mostrar guía manual
+function esDispositivoIOS() {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const esIos = /iphone|ipad|ipod/.test(userAgent);
+    const esSafari = /safari/.test(userAgent) && !/chrome|crios|fxios|android/.test(userAgent);
+    return esIos && esSafari;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Si estamos en un iPhone y no está en modo Standalone, mostramos la guía de iOS
+    if (esDispositivoIOS() && !window.matchMedia('(display-mode: standalone)').matches) {
+        const guiaIos = document.getElementById('guiaIosSafari');
+        if (guiaIos) {
+            guiaIos.classList.remove('hidden');
+        }
+    }
+});
+
 // 1. Pegado automático
 const btnPegar = document.getElementById('btnPegarPortapapeles');
 if (btnPegar) {
