@@ -6,7 +6,7 @@ const MASTER_SUPA_KEY = "sb_publishable_aVydbrj88elb7XVq1yopFw_2U4MHgHv";
 const supabaseMaster = createClient(MASTER_SUPA_URL, MASTER_SUPA_KEY);
 const getHardwareID = () => btoa(navigator.userAgent + navigator.language);
 
-// 1. Función de pegado automático desde el portapapeles para móviles
+// 1. Botón de pegado automático directo
 const btnPegar = document.getElementById('btnPegarPortapapeles');
 if (btnPegar) {
     btnPegar.addEventListener('click', async () => {
@@ -15,8 +15,10 @@ if (btnPegar) {
                 const textoCopiado = await navigator.clipboard.readText();
                 document.getElementById('tokenInput').value = textoCopiado.trim();
                 const statusDiv = document.getElementById('statusMsg');
-                statusDiv.className = "text-xs font-bold text-emerald-600";
-                statusDiv.innerText = "¡Código pegado con éxito!";
+                if (statusDiv) {
+                    statusDiv.className = "text-xs font-bold text-emerald-600";
+                    statusDiv.innerText = "¡Código pegado con éxito!";
+                }
             } else {
                 alert("Tu navegador no permite lectura automática. Mantén presionado el cuadro de texto.");
             }
@@ -26,7 +28,7 @@ if (btnPegar) {
     });
 }
 
-// 2. Proceso de activación, verificación de dispositivos e instalación PWA
+// 2. Proceso de activación exclusivo por Licencia (Sin contraseñas)
 async function procesarActivacionEInstalacion() {
     const rawToken = document.getElementById('tokenInput').value.trim();
     const statusDiv = document.getElementById('statusMsg');
@@ -45,6 +47,7 @@ async function procesarActivacionEInstalacion() {
             throw new Error("El token no contiene un ID de club válido.");
         }
 
+        // Consulta directa a la tabla de licencias en Supabase Maestro
         const { data: empresaData, error: empresaError } = await supabaseMaster
             .from('licencias')
             .select('*')
@@ -52,7 +55,7 @@ async function procesarActivacionEInstalacion() {
             .single();
 
         if (empresaError || !empresaData) {
-            throw new Error("La empresa o licencia no se encuentra registrada en el sistema central.");
+            throw new Error("El club o la licencia no existe en el sistema.");
         }
 
         let equiposLicencia = Array.isArray(empresaData.equipos) ? empresaData.equipos : [];
@@ -60,7 +63,7 @@ async function procesarActivacionEInstalacion() {
         let limiteLicencia = (limiteStr === "Ilimitado") ? 999 : (parseInt(limiteStr) || 3);
 
         if (!equiposLicencia.includes(hwID) && equiposLicencia.length >= limiteLicencia) {
-            alert("Error: Se ha alcanzado el límite de dispositivos permitidos para esta licencia.");
+            alert("Error: Límite de dispositivos alcanzado para esta licencia.");
             btn.disabled = false;
             btn.innerHTML = `<i class="fas fa-download text-sm"></i> Instalar Módulo y Comenzar`;
             return;
@@ -74,6 +77,7 @@ async function procesarActivacionEInstalacion() {
                 .eq('id', activationId);
         }
 
+        // Guardar la sesión automáticamente sin pedir credenciales ni claves
         localStorage.setItem('control_voley_supa_url', empresaData.supabase_url || data.supabaseUrl);
         localStorage.setItem('control_voley_supa_key', empresaData.supabase_key || data.supabaseKey);
         localStorage.setItem('control_voley_supa_bucket', empresaData.bucket || data.bucket || activationId);
@@ -85,6 +89,7 @@ async function procesarActivacionEInstalacion() {
         localStorage.setItem('youcontrol_empresa_id', activationId);
         localStorage.setItem('licencia_validada', 'true');
 
+        // Acceso directo o prompt de instalación
         if (window.deferredPrompt) {
             statusDiv.className = "text-xs font-bold text-amber-600";
             statusDiv.innerText = "Confirmando instalación de la App...";
@@ -95,37 +100,24 @@ async function procesarActivacionEInstalacion() {
 
             if (userChoice.outcome === 'accepted') {
                 statusDiv.className = "text-xs font-bold text-emerald-600";
-                statusDiv.innerText = "¡Aplicación instalada con éxito! Redirigiendo...";
-                setTimeout(() => {
-                    window.location.replace('index_stats.html');
-                }, 500);
+                statusDiv.innerText = "¡App instalada! Entrando...";
+                setTimeout(() => window.location.replace('index_stats.html'), 300);
             } else {
-                alert("Instalación obligatoria: Debes confirmar la instalación de la App para ingresar al módulo Stats.");
+                alert("Debes confirmar la instalación para continuar.");
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fas fa-download text-sm"></i> Instalar Módulo y Comenzar`;
-                statusDiv.className = "text-xs font-bold text-rose-600";
-                statusDiv.innerText = "Instalación cancelada. Debes instalar la App para ingresar.";
             }
-        } else if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-            statusDiv.className = "text-xs font-bold text-emerald-600";
-            statusDiv.innerText = "Licencia válida. Ingresando...";
-            setTimeout(() => {
-                window.location.replace('index_stats.html');
-            }, 500);
         } else {
-            alert("Para ingresar debes instalar esta aplicación. Usa la opción 'Añadir a la pantalla de inicio' o 'Instalar aplicación' desde el menú de tu navegador.");
-            btn.disabled = false;
-            btn.innerHTML = `<i class="fas fa-download text-sm"></i> Instalar Módulo y Comenzar`;
-            statusDiv.className = "text-xs font-bold text-rose-600";
-            statusDiv.innerText = "Instala la app desde el menú de tu navegador para continuar.";
+            statusDiv.className = "text-xs font-bold text-emerald-600";
+            statusDiv.innerText = "Licencia válida. Entrando...";
+            setTimeout(() => window.location.replace('index_stats.html'), 300);
         }
         
     } catch (e) {
         console.error("Error al procesar activación:", e);
-        alert("Código de licencia inválido o error en la conexión: " + e.message);
+        alert("Código de licencia inválido: " + e.message);
         btn.disabled = false;
         btn.innerHTML = `<i class="fas fa-download text-sm"></i> Instalar Módulo y Comenzar`;
-        statusDiv.innerText = "";
     }
 }
 
