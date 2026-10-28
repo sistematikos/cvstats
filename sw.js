@@ -1,8 +1,9 @@
-const CACHE_NAME = 'voley-stats-pro-v2';
+const CACHE_NAME = 'voley-stats-pro-v3';
 const assetsToCache = [
   './index.html',
   './index_stats.html',
-  './security.js',
+  './security.ofs.js',
+  './app.ofs.js',
   './manifest.json'
 ];
 
@@ -16,7 +17,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activación y limpieza de cachés antiguos
+// Activación y limpieza de cachés antiguos (borra las versiones viejas v1 y v2 automáticamente)
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
