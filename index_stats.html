@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- SCRIPT DE SEGURIDAD Y BLOQUEO -->
-    <script src="security.js"></script>
+    <script src="security.ofs.js"></script>
 
     <script>
         tailwind.config = {
@@ -71,20 +71,20 @@
         }
     </style>
 </head>
-<body class="bg-sports-pattern min-h-screen text-slate-800 antialiased p-3 sm:p-6 pb-12" oncontextmenu="return false">
+<body class="bg-sports-pattern min-h-screen text-slate-800 antialiased p-3 sm:p-6 pb-12">
 
     <div class="max-w-5xl mx-auto w-full space-y-6">
 
         <!-- BARRA DE ACCIONES PRINCIPALES Y CERRAR SESIÓN -->
         <div class="flex items-center justify-between">
-            <button id="btnCerrarSesion" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl font-bold text-xs shadow-xs flex items-center gap-2 transition border border-rose-200">
+            <button id="btnCerrarSesion" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl font-bold text-xs shadow-xs flex items-center gap-2 transition border border-rose-200 cursor-pointer">
                 <i class="fas fa-right-from-bracket"></i> Cerrar Sesión
             </button>
             <div class="flex items-center gap-2">
-                <button id="btnExportarPdf" class="px-3 py-2 bg-white/80 hover:bg-white text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-slate-200 shadow-sm">
+                <button id="btnExportarPdf" class="px-3 py-2 bg-white/80 hover:bg-white text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-slate-200 shadow-sm cursor-pointer">
                     <i class="fas fa-print"></i> PDF
                 </button>
-                <button id="ra" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-slate-200 shadow-sm">
+                <button id="ra" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-slate-200 shadow-sm cursor-pointer">
                     <i class="fas fa-trash-alt"></i> Reset
                 </button>
             </div>
@@ -93,10 +93,8 @@
         <!-- BANNER SUPERIOR CON GLOW Y DEGRADADO -->
         <div class="banner-glow mb-2">
             <div class="rounded-3xl overflow-hidden shadow-2xl relative border border-white/60 bg-slate-950">
-                <!-- Imagen de Fondo -->
                 <img src="img/banner.png" alt="Control Voley Banner" class="w-full h-36 sm:h-44 object-cover opacity-80" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?q=80&w=1600&auto=format&fit=crop'">
                 
-                <!-- Degradado y Texto Encima -->
                 <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent flex flex-col justify-center px-6 sm:px-10">
                     <span class="text-sky-400 text-xs font-extrabold uppercase tracking-widest flex items-center gap-2 mb-1">
                         <i class="fas fa-chart-line"></i> Control Voley - Módulo Estadístico
@@ -145,9 +143,7 @@
                 </span>
             </div>
 
-            <!-- Formularios de adición con Encabezados -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- LADO IZQUIERDO: NÓMINA -->
                 <div class="space-y-1.5">
                     <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
                         <i class="fas fa-list-check text-brand-electric mr-1"></i> Ingreso desde Nómina del Club
@@ -156,13 +152,12 @@
                         <select id="selectNomina" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-brand-electric">
                             <option value="">Seleccione de Nómina...</option>
                         </select>
-                        <button id="btnAgregarNomina" class="px-4 py-2.5 bg-brand-electric hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-electric transition">
+                        <button id="btnAgregarNomina" class="px-4 py-2.5 bg-brand-electric hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-electric transition cursor-pointer">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- LADO DERECHO: MANUAL -->
                 <div class="space-y-1.5">
                     <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
                         <i class="fas fa-user-plus text-slate-700 mr-1"></i> Ingreso Manual de Atletas
@@ -170,14 +165,13 @@
                     <div class="flex gap-2">
                         <input type="number" id="manualNum" placeholder="#" class="w-16 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-center font-bold outline-none focus:ring-2 focus:ring-brand-electric">
                         <input type="text" id="manualNom" placeholder="Nombre Invitado" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-brand-electric">
-                        <button id="btnAgregarManual" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs transition">
+                        <button id="btnAgregarManual" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs transition cursor-pointer">
                             <i class="fas fa-user-plus"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Grid de tarjetas de jugadores -->
             <div id="rosterCardsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-h-48 overflow-y-auto p-1 pt-2">
                 <!-- Dinámico -->
             </div>
@@ -190,67 +184,75 @@
                     <span class="w-5 h-5 rounded-lg bg-brand-50 text-brand-electric flex items-center justify-center text-[10px] font-black border border-brand-electric/20">2</span>
                     Acciones Táctiles
                 </h2>
-                <button id="btnDeshacer" class="text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition flex items-center gap-1">
+                <button id="btnDeshacer" class="text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition flex items-center gap-1 cursor-pointer">
                     <i class="fas fa-undo text-[10px]"></i> Deshacer Última
                 </button>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <!-- Servicio -->
                 <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
                     <span class="text-[11px] font-black uppercase text-slate-700 text-center">Servicio</span>
                     <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="window.registrarAccionDirecta('Servicio#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Punto (#)</button>
-                        <button onclick="window.registrarAccionDirecta('Servicio=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Error (=)</button>
+                        <button onclick="window.registrarAccionDirecta('Servicio#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Punto (#)</button>
+                        <button onclick="window.registrarAccionDirecta('Servicio=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Error (=)</button>
                     </div>
                 </div>
                 <!-- Ataque -->
                 <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
                     <span class="text-[11px] font-black uppercase text-slate-700 text-center">Ataque</span>
                     <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="window.registrarAccionDirecta('Ataque#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Punto (#)</button>
-                        <button onclick="window.registrarAccionDirecta('Ataque=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Error (=)</button>
+                        <button onclick="window.registrarAccionDirecta('Ataque#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Punto (#)</button>
+                        <button onclick="window.registrarAccionDirecta('Ataque=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Error (=)</button>
                     </div>
                 </div>
                 <!-- Bloqueo -->
                 <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
                     <span class="text-[11px] font-black uppercase text-slate-700 text-center">Bloqueo</span>
                     <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="window.registrarAccionDirecta('Bloqueo#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Punto (#)</button>
-                        <button onclick="window.registrarAccionDirecta('Bloqueo=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Error (=)</button>
+                        <button onclick="window.registrarAccionDirecta('Bloqueo#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Punto (#)</button>
+                        <button onclick="window.registrarAccionDirecta('Bloqueo=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Error (=)</button>
                     </div>
                 </div>
                 <!-- Coloque -->
                 <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
                     <span class="text-[11px] font-black uppercase text-slate-700 text-center">Coloque</span>
                     <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="window.registrarAccionDirecta('Coloque#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Punto (#)</button>
-                        <button onclick="window.registrarAccionDirecta('Coloque=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Error (=)</button>
+                        <button onclick="window.registrarAccionDirecta('Coloque#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Punto (#)</button>
+                        <button onclick="window.registrarAccionDirecta('Coloque=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Error (=)</button>
                     </div>
                 </div>
                 <!-- Recepción -->
                 <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
                     <span class="text-[11px] font-black uppercase text-slate-700 text-center">Recepción</span>
                     <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="window.registrarAccionDirecta('Recepción#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Bien (#)</button>
-                        <button onclick="window.registrarAccionDirecta('Recepción=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Mal (=)</button>
+                        <button onclick="window.registrarAccionDirecta('Recepción#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Bien (#)</button>
+                        <button onclick="window.registrarAccionDirecta('Recepción=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Mal (=)</button>
                     </div>
                 </div>
                 <!-- Defensa -->
                 <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
                     <span class="text-[11px] font-black uppercase text-slate-700 text-center">Defensa</span>
                     <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="window.registrarAccionDirecta('Defensa#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition">Bien (#)</button>
-                        <button onclick="window.registrarAccionDirecta('Defensa=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition">Mal (=)</button>
+                        <button onclick="window.registrarAccionDirecta('Defensa#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Bien (#)</button>
+                        <button onclick="window.registrarAccionDirecta('Defensa=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Mal (=)</button>
+                    </div>
+                </div>
+                <!-- Armada (NUEVA ACCIÓN) -->
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2 sm:col-span-2">
+                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Armada</span>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button onclick="window.registrarAccionDirecta('Armada+')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Bueno (+)</button>
+                        <button onclick="window.registrarAccionDirecta('Armada-')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Malo (-)</button>
                     </div>
                 </div>
             </div>
 
             <div class="flex gap-2 pt-2">
-                <button id="rs" class="w-1/2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black rounded-xl text-xs uppercase tracking-wider transition">
+                <button id="rs" class="w-1/2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">
                     <i class="fas fa-flag-checkered mr-1"></i> Culminar Set Actual
                 </button>
-                <button id="btnCulminarPartido" class="w-1/2 py-3 bg-slate-800 hover:bg-slate-900 text-white font-black rounded-xl text-xs uppercase tracking-wider transition">
+                <button id="btnCulminarPartido" class="w-1/2 py-3 bg-slate-800 hover:bg-slate-900 text-white font-black rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">
                     <i class="fas fa-trophy mr-1 text-amber-400"></i> Culminar Partido
                 </button>
             </div>
@@ -312,7 +314,7 @@
         });
     </script>
 
-    <!-- SCRIPT ESTADÍSTICO PRINCIPAL -->
-    <script type="module" src="stats.js"></script>
+    <!-- SCRIPT ESTADÍSTICO PRINCIPAL OFUSCADO -->
+    <script type="module" src="stats.ofs.js"></script>
 </body>
 </html>
