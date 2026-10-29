@@ -26,10 +26,11 @@
         let L_Nomina = [];
         let Roster = [];
         let S = []; // Set Actual en curso
-        let HistorialSets = []; // Sets anteriores culminados [[set1], [set2]...]
+        let HistorialSets = []; // Acciones acumuladas por set culminado [ [set1], [set2]... ]
         let M = []; // Total Partido Acumulado
         let atletaSeleccionadoKey = null;
-        let setResumenSeleccionado = 'ACTUAL'; // 'ACTUAL' o índice 0, 1, 2...
+        let setResumenSeleccionado = 'ACTUAL'; 
+        let setGraficaSeleccionado = 'ACTUAL'; // Control de gráfica activa
         let b = null, a = null;
         let toastTimeout = null;
 
@@ -50,7 +51,7 @@
             Defensa: 'Defensa',
             Armada: 'Armada'
         };
-        const P = { b: '#0055FF', r: '#dc2626', o: '#FF5500', g: '#10b981' };
+        const P = { b: '#0055FF', o: '#FF5500' };
         const K = { scales: { y: { ticks: { stepSize: 1 } } }, responsive: true, maintainAspectRatio: false };
 
         function mostrarToast(mensaje) {
@@ -206,14 +207,12 @@
             if (!tabsContainer) return;
             tabsContainer.innerHTML = '';
 
-            // Botón Set Actual
             let btnActual = document.createElement('button');
             btnActual.className = `px-3 py-1 rounded-xl text-[11px] font-black uppercase transition cursor-pointer ${setResumenSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
             btnActual.textContent = `Set Actual (#${HistorialSets.length + 1})`;
             btnActual.onclick = () => { setResumenSeleccionado = 'ACTUAL'; U(); };
             tabsContainer.appendChild(btnActual);
 
-            // Botones por cada set guardado en HistorialSets
             HistorialSets.forEach((_, idx) => {
                 let btnSet = document.createElement('button');
                 btnSet.className = `px-3 py-1 rounded-xl text-[11px] font-black uppercase transition cursor-pointer ${setResumenSeleccionado === idx ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
@@ -223,13 +222,34 @@
             });
         }
 
+        function renderGraficaTabs() {
+            const container = _('setGraficasTabs');
+            if (!container) return;
+            container.innerHTML = '';
+
+            let btnActual = document.createElement('button');
+            btnActual.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer ${setGraficaSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+            btnActual.textContent = `Gráfica Set Actual (#${HistorialSets.length + 1})`;
+            btnActual.onclick = () => { setGraficaSeleccionado = 'ACTUAL'; U(); };
+            container.appendChild(btnActual);
+
+            HistorialSets.forEach((_, idx) => {
+                let btnSet = document.createElement('button');
+                btnSet.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer ${setGraficaSeleccionado === idx ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+                btnSet.textContent = `Gráfica Set ${idx + 1}`;
+                btnSet.onclick = () => { setGraficaSeleccionado = idx; U(); };
+                container.appendChild(btnSet);
+            });
+        }
+
         function U() {
             renderResumenTabs();
+            renderGraficaTabs();
+
             const s = _('st');
             if (!s) return;
             s.innerHTML = '';
 
-            // Seleccionar qué conjunto de acciones evaluar para el Resumen Estadístico
             let accionesAResumir = S;
             if (setResumenSeleccionado !== 'ACTUAL') {
                 accionesAResumir = HistorialSets[setResumenSeleccionado] || [];
@@ -285,7 +305,7 @@
                 });
             }
 
-            // TABLA MATRICIAL POR SETS
+            // TABLA MATRICIAL POR SETS (CON PORCENTAJE, TOTALES Y DIFERENCIAL)
             const tbodySets = _('tablaSetsBody');
             if (tbodySets) {
                 tbodySets.innerHTML = '';
@@ -297,36 +317,44 @@
                         tr.className = "border-b border-slate-100 hover:bg-slate-50/50";
                         
                         let htmlCols = `<td class="p-2.5 font-bold text-slate-900">#${p.num} ${p.name}</td>`;
-                        let totalP = 0, totalN = 0;
+                        let totalP = 0, totalN = 0, totalGlobal = 0;
 
                         for (let i = 0; i < 5; i++) {
                             let accionesSet = (i === HistorialSets.length) ? S : (HistorialSets[i] || []);
-                            let setP = 0, setN = 0;
+                            let setP = 0, setN = 0, setTot = 0;
                             
                             accionesSet.forEach(ac => {
                                 if (ac.playerKey === p.key) {
                                     if (N[ac.action] > 0) setP++; else setN++;
+                                    setTot++;
                                 }
                             });
 
                             totalP += setP;
                             totalN += setN;
+                            totalGlobal += setTot;
+
+                            let setEf = setTot > 0 ? Math.round((setP / setTot) * 100) : 0;
                             let setDif = setP - setN;
 
                             if (i > HistorialSets.length) {
                                 htmlCols += `<td class="p-2.5 text-center text-slate-300">-</td>`;
                             } else {
                                 htmlCols += `<td class="p-2.5 text-center font-mono">
-                                    <span class="text-brand-electric font-bold">${setP}</span>/<span class="text-brand-orange font-bold">${setN}</span>
-                                    <div class="text-[9px] ${setDif >= 0 ? 'text-blue-600' : 'text-orange-600'}">Dif: ${setDif >= 0 ? '+' : ''}${setDif}</div>
+                                    <div class="text-brand-electric font-bold">${setP}/${setN}</div>
+                                    <div class="text-[10px] text-emerald-600 font-bold">${setEf}% Ef.</div>
+                                    <div class="text-[9px] ${setDif >= 0 ? 'text-blue-600' : 'text-orange-600'} font-bold">Dif: ${setDif >= 0 ? '+' : ''}${setDif}</div>
                                 </td>`;
                             }
                         }
 
+                        let totalEf = totalGlobal > 0 ? Math.round((totalP / totalGlobal) * 100) : 0;
                         let totalDif = totalP - totalN;
+
                         htmlCols += `<td class="p-2.5 text-center font-black bg-slate-50/80 font-mono">
-                            <span class="text-brand-electric">${totalP}</span>/<span class="text-brand-orange">${totalN}</span>
-                            <div class="text-[9px] ${totalDif >= 0 ? 'text-blue-600' : 'text-orange-600'}">Dif: ${totalDif >= 0 ? '+' : ''}${totalDif}</div>
+                            <div class="text-brand-electric">${totalP}/${totalN}</div>
+                            <div class="text-[10px] text-emerald-600 font-bold">${totalEf}% Ef.</div>
+                            <div class="text-[9px] ${totalDif >= 0 ? 'text-blue-600' : 'text-orange-600'} font-bold">Dif: ${totalDif >= 0 ? '+' : ''}${totalDif}</div>
                         </td>`;
 
                         tr.innerHTML = htmlCols;
@@ -335,16 +363,25 @@
                 }
             }
 
+            // GRÁFICAS INDEPENDIENTES POR SET Y ACUMULADAS
             const c1El = _('c1');
             const c2El = _('c2');
             if (c1El && c2El) {
                 const x1 = c1El.getContext('2d'), x2 = c2El.getContext('2d'), l = Object.values(O);
                 let v1 = { p: [0,0,0,0,0,0], n: [0,0,0,0,0,0] }, v2 = { p: [0,0,0,0,0,0], n: [0,0,0,0,0,0] }, tp = 0, tn = 0;
 
+                // Acciones para la gráfica del set seleccionado (Actual o Pasado)
+                let accionesGraficaSet = S;
+                let tituloSetLabel = `SET ACTUAL (Set #${HistorialSets.length + 1})`;
+                if (setGraficaSeleccionado !== 'ACTUAL') {
+                    accionesGraficaSet = HistorialSets[setGraficaSeleccionado] || [];
+                    tituloSetLabel = `SET #${setGraficaSeleccionado + 1} GUARDADO`;
+                }
+
                 const keys = Object.keys(O);
                 keys.forEach((k, idx) => {
                     let p = 0, n = 0, ap = 0, an = 0;
-                    S.forEach(z => { 
+                    accionesGraficaSet.forEach(z => { 
                         let t = z.action.replace(/[#=\+\-]/g, '');
                         if (t === k) N[z.action] > 0 ? p++ : n++; 
                     });
@@ -359,7 +396,7 @@
                 });
 
                 if (b) b.destroy();
-                b = new Chart(x1, { type: 'bar', data: { labels: l, datasets: [{ label: 'Positivo (+)', data: v1.p, backgroundColor: P.b }, { label: 'Negativo (-)', data: v1.n, backgroundColor: P.o }] }, options: { ...K, plugins: { title: { display: true, text: `SET ACTUAL (Set #${HistorialSets.length + 1})` } } } });
+                b = new Chart(x1, { type: 'bar', data: { labels: l, datasets: [{ label: 'Positivo (+)', data: v1.p, backgroundColor: P.b }, { label: 'Negativo (-)', data: v1.n, backgroundColor: P.o }] }, options: { ...K, plugins: { title: { display: true, text: tituloSetLabel } } } });
                 
                 const locInput = _('equipoLocal');
                 const rivInput = _('equipoRival');
@@ -516,7 +553,8 @@
                 if (confirm(`¿Deseas culminar el Set #${HistorialSets.length + 1} y pasar al siguiente?`)) {
                     HistorialSets.push([...S]);
                     S = [];
-                    setResumenSeleccionado = 'ACTUAL'; // Al cambiar de set limpia y muestra el nuevo set actual
+                    setResumenSeleccionado = 'ACTUAL';
+                    setGraficaSeleccionado = 'ACTUAL';
                     guardarEstado();
                     U();
                     mostrarToast(`Set #${HistorialSets.length} guardado correctamente`);
@@ -536,6 +574,7 @@
                     HistorialSets = [];
                     M = [];
                     setResumenSeleccionado = 'ACTUAL';
+                    setGraficaSeleccionado = 'ACTUAL';
                     guardarEstado();
                     U();
                     mostrarToast('Partido culminado y guardado en historial');
@@ -555,6 +594,7 @@
                     localStorage.removeItem('vRival_' + empresaID);
                     Roster = []; S = []; HistorialSets = []; M = []; atletaSeleccionadoKey = null;
                     setResumenSeleccionado = 'ACTUAL';
+                    setGraficaSeleccionado = 'ACTUAL';
                     const locInput = _('equipoLocal');
                     const rivInput = _('equipoRival');
                     if (locInput) locInput.value = clubNombre;
