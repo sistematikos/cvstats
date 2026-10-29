@@ -29,7 +29,7 @@ window.CVModuleRoster = (function() {
             const card = document.createElement('div');
             const isSelected = (atletaSeleccionadoKey === p.key);
             
-            // Estructura horizontal en una sola línea
+            // Estructura horizontal limpia en una sola línea
             card.className = `relative px-3 py-2.5 rounded-2xl cursor-pointer flex items-center gap-2.5 card-atleta-item shadow-sm select-none touch-manipulation ${isSelected ? 'card-atleta-selected' : ''}`;
             
             const handleSelect = (e) => {
