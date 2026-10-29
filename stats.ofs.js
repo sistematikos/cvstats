@@ -24,10 +24,10 @@
         const supabase = createClient(supaUrl, supaKey);
 
         let L_Nomina = [];
-        let Roster = [];
-        let S = []; 
-        let HistorialSets = []; 
-        let M = []; 
+        let Roster = JSON.parse(localStorage.getItem('vRoster_' + empresaID) || '[]');
+        let S = JSON.parse(localStorage.getItem('vS_' + empresaID) || '[]');
+        let HistorialSets = JSON.parse(localStorage.getItem('vHistSets_' + empresaID) || '[]');
+        let M = JSON.parse(localStorage.getItem('vM_' + empresaID) || '[]');
         let atletaSeleccionadoKey = null;
         let setResumenSeleccionado = 'ACTUAL'; 
         let setGraficaSeleccionado = 'ACTUAL'; 
@@ -43,14 +43,7 @@
             'Armada+': 1,    'Armada-': -1
         };
 
-        const O = { 
-            Servicio: 'Servicio', 
-            Ataque: 'Ataque', 
-            Bloqueo: 'Bloqueo', 
-            Recepción: 'Recepción', 
-            Defensa: 'Defensa',
-            Armada: 'Armada'
-        };
+        const O = { Servicio: 'Servicio', Ataque: 'Ataque', Bloqueo: 'Bloqueo', Recepción: 'Recepción', Defensa: 'Defensa', Armada: 'Armada' };
         const P = { b: '#0055FF', o: '#FF5500' };
         const K = { scales: { y: { ticks: { stepSize: 1 } } }, responsive: true, maintainAspectRatio: false };
 
@@ -78,27 +71,6 @@
             localStorage.setItem('vM_' + empresaID, JSON.stringify(M));
         }
 
-        function guardarEnHistorial() {
-            if (!M.length) return;
-            let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
-            const loc = _('equipoLocal')?.value || clubNombre;
-            const riv = _('equipoRival')?.value || 'Rival';
-            
-            const partidoResumen = {
-                id: Date.now(),
-                fecha: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-                enfrentamiento: `${loc} vs ${riv}`,
-                accionesTotales: M.length,
-                datos: [...M],
-                sets: [...HistorialSets]
-            };
-
-            historial.unshift(partidoResumen);
-            if (historial.length > 7) historial.pop();
-            localStorage.setItem('vHistorial_' + empresaID, JSON.stringify(historial));
-            renderHistorial();
-        }
-
         function renderHistorial() {
             const grid = _('historialGrid');
             if (!grid) return;
@@ -123,39 +95,64 @@
             });
         }
 
-        function U() {
-            // Módulo Resultados: Pestañas de resumen
+        function actualizarInterfazGeneral() {
+            // 1. Roster
+            if (window.CVModuleRoster) {
+                window.CVModuleRoster.renderRosterCards(Roster, atletaSeleccionadoKey, (k, num, name) => {
+                    if (window.CVModuleRoster) {
+                        window.CVModuleRoster.seleccionarAtleta(k, num, name, (keySel) => { atletaSeleccionadoKey = keySel; });
+                    }
+                }, (k) => { window.quitarDeRoster(k); });
+            }
+
+            // 2. Resultados y Tablas
             if (window.CVModuleResultados) {
                 window.CVModuleResultados.renderResumenTabs(HistorialSets, setResumenSeleccionado, (nuevoSet) => {
                     setResumenSeleccionado = nuevoSet;
-                    U();
+                    actualizarInterfazGeneral();
                 });
                 window.CVModuleResultados.renderResumenAtletas(Roster, S, HistorialSets, setResumenSeleccionado, N);
                 window.CVModuleResultados.renderTablaMatricial(Roster, S, HistorialSets, N);
             }
 
-            // Módulo Gráficas: Pestañas y renderizado de gráficos
+            // 3. Gráficas
             if (window.CVModuleGraficas) {
                 window.CVModuleGraficas.renderGraficaTabs(HistorialSets, setGraficaSeleccionado, (nuevoSet) => {
                     setGraficaSeleccionado = nuevoSet;
-                    U();
+                    actualizarInterfazGeneral();
                 });
                 let resGraficas = window.CVModuleGraficas.actualizarGraficas(S, HistorialSets, M, setGraficaSeleccionado, O, N, P, K, b, a);
                 b = resGraficas.b;
                 a = resGraficas.a;
             }
 
-            // Módulo Cuadro de Honor
+            // 4. Cuadro de Honor
             if (window.CVModuleHonor) {
                 window.CVModuleHonor.renderCuadroHonor(Roster, M, N);
             }
         }
 
-        // ACCIONES DE ROSTER Y BOTONES
-        if (window.CVModuleRoster) {
-            window.CVModuleRoster.poblarNominaSelect(L_Nomina);
-        }
+        window.quitarDeRoster = (key) => {
+            Roster = Roster.filter(x => x.key !== key);
+            if (atletaSeleccionadoKey === key) {
+                atletaSeleccionadoKey = null;
+                const badge = _('atletaSeleccionadoBadge');
+                if (badge) badge.classList.add('hidden');
+            }
+            guardarEstado();
+            actualizarInterfazGeneral();
+        };
 
+        window.registrarAccionDirecta = (accion) => {
+            if (window.CVModuleAcciones) {
+                window.CVModuleAcciones.registrarAccion(atletaSeleccionadoKey, accion, N, M, S, () => {
+                    guardarEstado();
+                    actualizarInterfazGeneral();
+                }, mostrarToast);
+            }
+        };
+
+        // Event Listeners de Botones
         const btnAgNom = _('btnAgregarNomina');
         if (btnAgNom) {
             btnAgNom.onclick = () => {
@@ -169,14 +166,7 @@
                         name: `${atleta.nombre} ${atleta.apellido || ''}`.trim()
                     });
                     guardarEstado();
-                    if (window.CVModuleRoster) {
-                        window.CVModuleRoster.renderRosterCards(Roster, atletaSeleccionadoKey, (k, num, name) => {
-                            if (window.CVModuleRoster) {
-                                window.CVModuleRoster.seleccionarAtleta(k, num, name, (keySel) => { atletaSeleccionadoKey = keySel; });
-                            }
-                        }, (k) => { window.quitarDeRoster(k); });
-                    }
-                    U();
+                    actualizarInterfazGeneral();
                     mostrarToast('Atleta añadido al Roster');
                 }
             };
@@ -196,44 +186,10 @@
                 _('manualNom').value = '';
 
                 guardarEstado();
-                if (window.CVModuleRoster) {
-                    window.CVModuleRoster.renderRosterCards(Roster, atletaSeleccionadoKey, (k, n, nm) => {
-                        if (window.CVModuleRoster) {
-                            window.CVModuleRoster.seleccionarAtleta(k, n, nm, (keySel) => { atletaSeleccionadoKey = keySel; });
-                        }
-                    }, (k) => { window.quitarDeRoster(k); });
-                }
-                U();
+                actualizarInterfazGeneral();
                 mostrarToast('Atleta invitado añadido');
             };
         }
-
-        window.quitarDeRoster = (key) => {
-            Roster = Roster.filter(x => x.key !== key);
-            if (atletaSeleccionadoKey === key) {
-                atletaSeleccionadoKey = null;
-                const badge = _('atletaSeleccionadoBadge');
-                if (badge) badge.classList.add('hidden');
-            }
-            guardarEstado();
-            if (window.CVModuleRoster) {
-                window.CVModuleRoster.renderRosterCards(Roster, atletaSeleccionadoKey, (k, num, name) => {
-                    if (window.CVModuleRoster) {
-                        window.CVModuleRoster.seleccionarAtleta(k, num, name, (keySel) => { atletaSeleccionadoKey = keySel; });
-                    }
-                }, (k) => { window.quitarDeRoster(k); });
-            }
-            U();
-        };
-
-        window.registrarAccionDirecta = (accion) => {
-            if (window.CVModuleAcciones) {
-                window.CVModuleAcciones.registrarAccion(atletaSeleccionadoKey, accion, N, M, S, () => {
-                    guardarEstado();
-                    U();
-                }, mostrarToast);
-            }
-        };
 
         const btnDeshacer = _('btnDeshacer');
         if (btnDeshacer) {
@@ -241,7 +197,7 @@
                 if (window.CVModuleAcciones) {
                     window.CVModuleAcciones.deshacerAccion(S, M, () => {
                         guardarEstado();
-                        U();
+                        actualizarInterfazGeneral();
                     }, mostrarToast);
                 }
             };
@@ -255,7 +211,7 @@
                         setResumenSeleccionado = 'ACTUAL';
                         setGraficaSeleccionado = 'ACTUAL';
                         guardarEstado();
-                        U();
+                        actualizarInterfazGeneral();
                     }, mostrarToast);
                 }
             };
@@ -264,19 +220,34 @@
         const btnCulPart = _('btnCulminarPartido');
         if (btnCulPart) {
             btnCulPart.onclick = () => {
-                if (confirm('¿Desea culminar el partido? Esto guardará el historial completo de sets, reseteará las acciones y conservará el roster.')) {
+                if (confirm('¿Desea culminar el partido? Esto guardará el historial, reseteará las acciones y conservará el roster.')) {
                     if (S.length > 0 && HistorialSets.length < 5) {
                         HistorialSets.push([...S]);
                     }
-                    guardarEnHistorial();
+                    let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
+                    const loc = _('equipoLocal')?.value || clubNombre;
+                    const riv = _('equipoRival')?.value || 'Rival';
+                    
+                    historial.unshift({
+                        id: Date.now(),
+                        fecha: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                        enfrentamiento: `${loc} vs ${riv}`,
+                        accionesTotales: M.length,
+                        datos: [...M],
+                        sets: [...HistorialSets]
+                    });
+                    if (historial.length > 7) historial.pop();
+                    localStorage.setItem('vHistorial_' + empresaID, JSON.stringify(historial));
+
                     S = [];
                     HistorialSets = [];
                     M = [];
                     setResumenSeleccionado = 'ACTUAL';
                     setGraficaSeleccionado = 'ACTUAL';
                     guardarEstado();
-                    U();
-                    mostrarToast('Partido culminado y guardado en historial');
+                    renderHistorial();
+                    actualizarInterfazGeneral();
+                    mostrarToast('Partido culminado y guardado');
                 }
             };
         }
@@ -284,7 +255,7 @@
         const raBtn = _('ra');
         if (raBtn) {
             raBtn.onclick = () => {
-                if (confirm('¿Seguro que deseas ELIMINAR EL JUEGO? Se blanqueará el Roster, se borrarán las estadísticas y se reiniciarán los datos.')) {
+                if (confirm('¿Seguro que deseas ELIMINAR EL JUEGO? Se blanqueará el Roster y se reiniciarán los datos.')) {
                     localStorage.removeItem('vRoster_' + empresaID);
                     localStorage.removeItem('vS_' + empresaID);
                     localStorage.removeItem('vHistSets_' + empresaID);
@@ -294,6 +265,7 @@
                     Roster = []; S = []; HistorialSets = []; M = []; atletaSeleccionadoKey = null;
                     setResumenSeleccionado = 'ACTUAL';
                     setGraficaSeleccionado = 'ACTUAL';
+                    
                     const locInput = _('equipoLocal');
                     const rivInput = _('equipoRival');
                     if (locInput) locInput.value = clubNombre;
@@ -301,10 +273,7 @@
                     const badge = _('atletaSeleccionadoBadge');
                     if (badge) badge.classList.add('hidden');
                     
-                    if (window.CVModuleRoster) {
-                        window.CVModuleRoster.renderRosterCards(Roster, atletaSeleccionadoKey, () => {}, () => {});
-                    }
-                    U();
+                    actualizarInterfazGeneral();
                     mostrarToast('Juego eliminado y reiniciado');
                 }
             };
@@ -312,9 +281,7 @@
 
         const btnExpPdf = _('btnExportarPdf');
         if (btnExpPdf) {
-            btnExpPdf.onclick = () => {
-                window.print();
-            };
+            btnExpPdf.onclick = () => window.print();
         }
 
         async function init() {
@@ -332,6 +299,11 @@
             if (locInput) locInput.oninput = e => localStorage.setItem('vLocal_' + empresaID, e.target.value);
             if (rivInput) rivInput.oninput = e => localStorage.setItem('vRival_' + empresaID, e.target.value);
 
+            // 1. PINTAR INMEDIATAMENTE LO QUE HAY EN LOCALSTORAGE (Evita que el móvil quede en blanco)
+            actualizarInterfazGeneral();
+            renderHistorial();
+
+            // 2. CARGAR NÓMINA DESDE SUPABASE EN SEGUNDO PLANO
             try {
                 const { data: atletas } = await supabase.from('atletas').select('*').order('nroCamiseta', { ascending: true });
                 L_Nomina = atletas || [];
@@ -339,23 +311,8 @@
                     window.CVModuleRoster.poblarNominaSelect(L_Nomina);
                 }
             } catch (err) {
-                console.error("Error al cargar atletas:", err);
+                console.error("Error al cargar atletas de Supabase:", err);
             }
-
-            Roster = JSON.parse(localStorage.getItem('vRoster_' + empresaID) || '[]');
-            S = JSON.parse(localStorage.getItem('vS_' + empresaID) || '[]');
-            HistorialSets = JSON.parse(localStorage.getItem('vHistSets_' + empresaID) || '[]');
-            M = JSON.parse(localStorage.getItem('vM_' + empresaID) || '[]');
-
-            if (window.CVModuleRoster) {
-                window.CVModuleRoster.renderRosterCards(Roster, atletaSeleccionadoKey, (k, num, name) => {
-                    if (window.CVModuleRoster) {
-                        window.CVModuleRoster.seleccionarAtleta(k, num, name, (keySel) => { atletaSeleccionadoKey = keySel; });
-                    }
-                }, (k) => { window.quitarDeRoster(k); });
-            }
-            renderHistorial();
-            U();
         }
 
         init();
