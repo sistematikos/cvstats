@@ -25,12 +25,12 @@
 
         let L_Nomina = [];
         let Roster = [];
-        let S = []; // Set Actual en curso
-        let HistorialSets = []; // Acciones acumuladas por set culminado [ [set1], [set2]... ]
-        let M = []; // Total Partido Acumulado
+        let S = []; 
+        let HistorialSets = []; 
+        let M = []; 
         let atletaSeleccionadoKey = null;
         let setResumenSeleccionado = 'ACTUAL'; 
-        let setGraficaSeleccionado = 'ACTUAL'; // Control de gráfica activa
+        let setGraficaSeleccionado = 'ACTUAL'; 
         let b = null, a = null;
         let toastTimeout = null;
 
@@ -289,15 +289,15 @@
             } else {
                 listaOrdenada.forEach(k => {
                     let dt = '';
-                    Object.keys(k.a).forEach(x => dt += `<span class="mr-2 font-mono">${x}: <span class="text-brand-electric font-bold">${k.a[x].p}</span>|<span class="text-brand-orange font-bold">${k.a[x].n}</span></span>`);
+                    Object.keys(k.a).forEach(x => dt += `<span class="mr-2 font-mono">${x}: <span class="text-brand-electric font-bold">${k.a[x].p}</span>|<span class="text-rose-600 font-bold">${k.a[x].n}</span></span>`);
                     s.innerHTML += `
                         <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs flex flex-col gap-1 shadow-sm">
                             <div class="flex justify-between items-center font-black text-slate-800">
                                 <span>#${k.num} ${k.name}</span>
                                 <div class="flex items-center gap-1.5">
-                                    <span class="px-2 py-0.5 rounded-lg ${k.dif >= 0 ? 'bg-blue-50 text-brand-electric' : 'bg-orange-50 text-brand-orange'} font-mono">Dif: ${k.dif >= 0 ? '+' : ''}${k.dif}</span>
+                                    <span class="px-2 py-0.5 rounded-lg ${k.dif >= 0 ? 'bg-blue-50 text-brand-electric' : 'bg-rose-50 text-rose-600'} font-mono text-sm font-black">Dif: ${k.dif >= 0 ? '+' : ''}${k.dif}</span>
                                     <span class="px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-black border border-emerald-200 font-mono">${k.efectividad}% Ef.</span>
-                                    <span class="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-black border border-slate-200 font-mono">Total <span class="text-brand-electric">${k.p}</span> | <span class="text-brand-orange">${k.n}</span></span>
+                                    <span class="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-black border border-slate-200 font-mono">Total <span class="text-brand-electric">${k.p}</span> | <span class="text-rose-600">${k.n}</span></span>
                                 </div>
                             </div>
                             <div class="text-[10px] text-slate-500">${dt || '<span class="italic text-slate-400">Sin jugadas registradas en este set</span>'}</div>
@@ -305,7 +305,7 @@
                 });
             }
 
-            // TABLA MATRICIAL POR SETS (CON PORCENTAJE, TOTALES Y DIFERENCIAL)
+            // TABLA MATRICIAL POR SETS (DIFERENCIAL DE PRIMERO Y DESTACADO, TOTALES CON POSITIVO AZUL Y NEGATIVO ROJO)
             const tbodySets = _('tablaSetsBody');
             if (tbodySets) {
                 tbodySets.innerHTML = '';
@@ -341,9 +341,9 @@
                                 htmlCols += `<td class="p-2.5 text-center text-slate-300">-</td>`;
                             } else {
                                 htmlCols += `<td class="p-2.5 text-center font-mono">
-                                    <div class="text-brand-electric font-bold">${setP}/${setN}</div>
-                                    <div class="text-[10px] text-emerald-600 font-bold">${setEf}% Ef.</div>
-                                    <div class="text-[9px] ${setDif >= 0 ? 'text-blue-600' : 'text-orange-600'} font-bold">Dif: ${setDif >= 0 ? '+' : ''}${setDif}</div>
+                                    <div class="text-xs font-black ${setDif >= 0 ? 'text-brand-electric' : 'text-rose-600'}">Dif: ${setDif >= 0 ? '+' : ''}${setDif}</div>
+                                    <div class="text-[11px] font-bold text-slate-700"><span class="text-brand-electric">${setP}</span> | <span class="text-rose-600">${setN}</span></div>
+                                    <div class="text-[9px] text-emerald-600 font-bold">${setEf}% Ef.</div>
                                 </td>`;
                             }
                         }
@@ -352,9 +352,9 @@
                         let totalDif = totalP - totalN;
 
                         htmlCols += `<td class="p-2.5 text-center font-black bg-slate-50/80 font-mono">
-                            <div class="text-brand-electric">${totalP}/${totalN}</div>
-                            <div class="text-[10px] text-emerald-600 font-bold">${totalEf}% Ef.</div>
-                            <div class="text-[9px] ${totalDif >= 0 ? 'text-blue-600' : 'text-orange-600'} font-bold">Dif: ${totalDif >= 0 ? '+' : ''}${totalDif}</div>
+                            <div class="text-xs font-black ${totalDif >= 0 ? 'text-brand-electric' : 'text-rose-600'}">Dif: ${totalDif >= 0 ? '+' : ''}${totalDif}</div>
+                            <div class="text-[11px] font-bold text-slate-900"><span class="text-brand-electric">${totalP}</span> | <span class="text-rose-600">${totalN}</span></div>
+                            <div class="text-[9px] text-emerald-600 font-bold">${totalEf}% Ef.</div>
                         </td>`;
 
                         tr.innerHTML = htmlCols;
@@ -370,7 +370,6 @@
                 const x1 = c1El.getContext('2d'), x2 = c2El.getContext('2d'), l = Object.values(O);
                 let v1 = { p: [0,0,0,0,0,0], n: [0,0,0,0,0,0] }, v2 = { p: [0,0,0,0,0,0], n: [0,0,0,0,0,0] }, tp = 0, tn = 0;
 
-                // Acciones para la gráfica del set seleccionado (Actual o Pasado)
                 let accionesGraficaSet = S;
                 let tituloSetLabel = `SET ACTUAL (Set #${HistorialSets.length + 1})`;
                 if (setGraficaSeleccionado !== 'ACTUAL') {
@@ -404,7 +403,7 @@
                 const riv = rivInput ? rivInput.value || 'Rival' : 'Rival';
                 
                 const sumEl = _('sum');
-                if (sumEl) sumEl.innerHTML = `${loc} vs ${riv} — Sets jugados: <span class="text-brand-electric font-bold">${HistorialSets.length + 1}</span> | Positivos Totales: <span class="text-brand-electric font-bold">${tp}</span> | Negativos Totales: <span class="text-brand-orange font-bold">${tn}</span>`;
+                if (sumEl) sumEl.innerHTML = `${loc} vs ${riv} — Sets jugados: <span class="text-brand-electric font-bold">${HistorialSets.length + 1}</span> | Positivos Totales: <span class="text-brand-electric font-bold">${tp}</span> | Negativos Totales: <span class="text-rose-600 font-bold">${tn}</span>`;
                 
                 if (a) a.destroy();
                 a = new Chart(x2, { type: 'bar', data: { labels: l, datasets: [{ label: 'Positivo (+)', data: v2.p, backgroundColor: P.b }, { label: 'Negativo (-)', data: v2.n, backgroundColor: P.o }] }, options: { ...K, plugins: { title: { display: true, text: 'TOTAL PARTIDO ACUMULADO' } } } });
@@ -476,8 +475,8 @@
                         <div>
                             <div class="text-xs font-black text-slate-900 truncate">#${k.num} ${k.name}</div>
                             <div class="flex items-center justify-between text-[10px] font-semibold mt-1">
-                                <span class="font-mono ${k.dif >= 0 ? 'text-brand-electric' : 'text-brand-orange'}">Dif: ${k.dif >= 0 ? '+' : ''}${k.dif}</span>
-                                <span class="font-mono text-slate-600">Total <span class="text-brand-electric font-bold">${k.p}</span> | <span class="text-brand-orange font-bold">${k.n}</span></span>
+                                <span class="font-mono text-sm font-black ${k.dif >= 0 ? 'text-brand-electric' : 'text-rose-600'}">Dif: ${k.dif >= 0 ? '+' : ''}${k.dif}</span>
+                                <span class="font-mono text-slate-600">Total <span class="text-brand-electric font-bold">${k.p}</span> | <span class="text-rose-600 font-bold">${k.n}</span></span>
                             </div>
                         </div>
                     </div>
