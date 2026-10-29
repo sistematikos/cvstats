@@ -26,12 +26,12 @@
         let L_Nomina = [];
         let Roster = [];
         let S = [];
+        let HistorialSets = [];
         let M = [];
         let atletaSeleccionadoKey = null;
         let b = null, a = null;
         let toastTimeout = null;
 
-        // Mapeo sin "Coloque"
         const N = {
             'Servicio#': 1,  'Servicio=': -1,
             'Ataque#': 1,    'Ataque=': -1,
@@ -104,7 +104,6 @@
                 card.className = `relative p-2.5 rounded-2xl cursor-pointer flex items-center gap-2 card-atleta-item shadow-sm ${isSelected ? 'card-atleta-selected' : ''}`;
                 card.onclick = () => seleccionarAtleta(p.key, p.num, p.name);
 
-                // Número y nombre en la misma línea
                 card.innerHTML = `
                     <button type="button" class="absolute top-1 right-2 text-slate-300 hover:text-rose-600 font-bold text-xs z-10" onclick="event.stopPropagation(); window.quitarDeRoster('${p.key}')">&times;</button>
                     <span class="px-2 py-0.5 rounded-lg bg-blue-50 text-brand-electric font-black text-xs border border-blue-100 shrink-0">#${p.num}</span>
@@ -152,6 +151,7 @@
         function guardarEstado() {
             localStorage.setItem('vRoster_' + empresaID, JSON.stringify(Roster));
             localStorage.setItem('vS_' + empresaID, JSON.stringify(S));
+            localStorage.setItem('vHistSets_' + empresaID, JSON.stringify(HistorialSets));
             localStorage.setItem('vM_' + empresaID, JSON.stringify(M));
         }
 
@@ -166,7 +166,8 @@
                 fecha: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
                 enfrentamiento: `${loc} vs ${riv}`,
                 accionesTotales: M.length,
-                datos: [...M]
+                datos: [...M],
+                sets: [...HistorialSets]
             };
 
             historial.unshift(partidoResumen);
@@ -191,7 +192,7 @@
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs flex justify-between items-center">
                         <div>
                             <span class="font-black text-slate-900">${h.enfrentamiento}</span>
-                            <div class="text-[10px] text-slate-500">Fecha: ${h.fecha} — Acciones: ${h.accionesTotales}</div>
+                            <div class="text-[10px] text-slate-500">Fecha: ${h.fecha} — Sets jugados: ${h.sets?.length || 0}</div>
                         </div>
                         <span class="px-2 py-1 bg-brand-50 text-brand-electric font-bold rounded-lg border border-brand-electric/20">Partido #${idx + 1}</span>
                     </div>
@@ -228,7 +229,6 @@
                 k.dif = k.p - k.n;
             });
 
-            // Ordenado estricto por mayor diferencial
             const listaOrdenada = Object.values(d).sort((a, b) => {
                 if (b.dif !== a.dif) return b.dif - a.dif;
                 return b.p - a.p;
@@ -255,6 +255,55 @@
                 });
             }
 
+            const tbodySets = _('tablaSetsBody');
+            if (tbodySets) {
+                tbodySets.innerHTML = '';
+                if (!Roster.length) {
+                    tbodySets.innerHTML = '<tr><td colspan="7" class="text-center py-3 text-slate-400 italic">Sin atletas en el roster.</td></tr>';
+                } else {
+                    Roster.forEach(p => {
+                        let tr = document.createElement('tr');
+                        tr.className = "border-b border-slate-100 hover:bg-slate-50/50";
+                        
+                        let htmlCols = `<td class="p-2.5 font-bold text-slate-900">#${p.num} ${p.name}</td>`;
+                        let totalP = 0, totalN = 0;
+
+                        for (let i = 0; i < 5; i++) {
+                            let accionesSet = (i === HistorialSets.length) ? S : (HistorialSets[i] || []);
+                            let setP = 0, setN = 0;
+                            
+                            accionesSet.forEach(ac => {
+                                if (ac.playerKey === p.key) {
+                                    if (N[ac.action] > 0) setP++; else setN++;
+                                }
+                            });
+
+                            totalP += setP;
+                            totalN += setN;
+                            let setDif = setP - setN;
+
+                            if (i > HistorialSets.length) {
+                                htmlCols += `<td class="p-2.5 text-center text-slate-300">-</td>`;
+                            } else {
+                                htmlCols += `<td class="p-2.5 text-center font-mono">
+                                    <span class="text-brand-electric font-bold">${setP}</span>/<span class="text-brand-orange font-bold">${setN}</span>
+                                    <div class="text-[9px] ${setDif >= 0 ? 'text-blue-600' : 'text-orange-600'}">Dif: ${setDif >= 0 ? '+' : ''}${setDif}</div>
+                                </td>`;
+                            }
+                        }
+
+                        let totalDif = totalP - totalN;
+                        htmlCols += `<td class="p-2.5 text-center font-black bg-slate-50/80 font-mono">
+                            <span class="text-brand-electric">${totalP}</span>/<span class="text-brand-orange">${totalN}</span>
+                            <div class="text-[9px] ${totalDif >= 0 ? 'text-blue-600' : 'text-orange-600'}">Dif: ${totalDif >= 0 ? '+' : ''}${totalDif}</div>
+                        </td>`;
+
+                        tr.innerHTML = htmlCols;
+                        tbodySets.appendChild(tr);
+                    });
+                }
+            }
+
             const c1El = _('c1');
             const c2El = _('c2');
             if (c1El && c2El) {
@@ -279,7 +328,7 @@
                 });
 
                 if (b) b.destroy();
-                b = new Chart(x1, { type: 'bar', data: { labels: l, datasets: [{ label: 'Positivo (+)', data: v1.p, backgroundColor: P.b }, { label: 'Negativo (-)', data: v1.n, backgroundColor: P.o }] }, options: { ...K, plugins: { title: { display: true, text: 'SET ACTUAL' } } } });
+                b = new Chart(x1, { type: 'bar', data: { labels: l, datasets: [{ label: 'Positivo (+)', data: v1.p, backgroundColor: P.b }, { label: 'Negativo (-)', data: v1.n, backgroundColor: P.o }] }, options: { ...K, plugins: { title: { display: true, text: `SET ACTUAL (Set #${HistorialSets.length + 1})` } } } });
                 
                 const locInput = _('equipoLocal');
                 const rivInput = _('equipoRival');
@@ -287,10 +336,10 @@
                 const riv = rivInput ? rivInput.value || 'Rival' : 'Rival';
                 
                 const sumEl = _('sum');
-                if (sumEl) sumEl.innerHTML = `${loc} vs ${riv} — Positivos: <span class="text-brand-electric font-bold">${tp}</span> | Negativos: <span class="text-brand-orange font-bold">${tn}</span>`;
+                if (sumEl) sumEl.innerHTML = `${loc} vs ${riv} — Sets jugados: <span class="text-brand-electric font-bold">${HistorialSets.length + 1}</span> | Positivos Totales: <span class="text-brand-electric font-bold">${tp}</span> | Negativos Totales: <span class="text-brand-orange font-bold">${tn}</span>`;
                 
                 if (a) a.destroy();
-                a = new Chart(x2, { type: 'bar', data: { labels: l, datasets: [{ label: 'Positivo (+)', data: v2.p, backgroundColor: P.b }, { label: 'Negativo (-)', data: v2.n, backgroundColor: P.o }] }, options: { ...K, plugins: { title: { display: true, text: 'TOTAL PARTIDO' } } } });
+                a = new Chart(x2, { type: 'bar', data: { labels: l, datasets: [{ label: 'Positivo (+)', data: v2.p, backgroundColor: P.b }, { label: 'Negativo (-)', data: v2.n, backgroundColor: P.o }] }, options: { ...K, plugins: { title: { display: true, text: 'TOTAL PARTIDO ACUMULADO' } } } });
             }
 
             renderCuadroHonor();
@@ -319,7 +368,6 @@
                 k.dif = k.p - k.n;
             });
 
-            // Ordenado estricto por mayor diferencial para el cuadro de honor
             const topCuadro = Object.values(dPartido)
                 .filter(x => x.total > 0)
                 .sort((a, b) => {
@@ -369,7 +417,6 @@
             });
         }
 
-        // Event Listeners
         const btnAgNom = _('btnAgregarNomina');
         if (btnAgNom) {
             btnAgNom.onclick = () => {
@@ -431,11 +478,16 @@
         const rsBtn = _('rs');
         if (rsBtn) {
             rsBtn.onclick = () => {
-                if (confirm('¿Desea culminar el set actual y reiniciar la estadística para el siguiente set?')) {
+                if (HistorialSets.length >= 5) {
+                    alert("Ya se han registrado los 5 sets reglamentarios del partido.");
+                    return;
+                }
+                if (confirm(`¿Deseas culminar el Set #${HistorialSets.length + 1} y pasar al siguiente?`)) {
+                    HistorialSets.push([...S]);
                     S = [];
                     guardarEstado();
                     U();
-                    mostrarToast('Set culminado');
+                    mostrarToast(`Set #${HistorialSets.length} guardado correctamente`);
                 }
             };
         }
@@ -443,9 +495,13 @@
         const btnCulPart = _('btnCulminarPartido');
         if (btnCulPart) {
             btnCulPart.onclick = () => {
-                if (confirm('¿Desea culminar el partido? Esto guardará el historial, reseteará las acciones a cero y conservará los atletas en el roster.')) {
+                if (confirm('¿Desea culminar el partido? Esto guardará el historial completo de sets, reseteará las acciones y conservará el roster.')) {
+                    if (S.length > 0 && HistorialSets.length < 5) {
+                        HistorialSets.push([...S]);
+                    }
                     guardarEnHistorial();
                     S = [];
+                    HistorialSets = [];
                     M = [];
                     guardarEstado();
                     U();
@@ -460,10 +516,11 @@
                 if (confirm('¿Seguro que deseas ELIMINAR EL JUEGO? Se blanqueará el Roster, se borrarán las estadísticas y se reiniciarán los datos.')) {
                     localStorage.removeItem('vRoster_' + empresaID);
                     localStorage.removeItem('vS_' + empresaID);
+                    localStorage.removeItem('vHistSets_' + empresaID);
                     localStorage.removeItem('vM_' + empresaID);
                     localStorage.removeItem('vLocal_' + empresaID);
                     localStorage.removeItem('vRival_' + empresaID);
-                    Roster = []; S = []; M = []; atletaSeleccionadoKey = null;
+                    Roster = []; S = []; HistorialSets = []; M = []; atletaSeleccionadoKey = null;
                     const locInput = _('equipoLocal');
                     const rivInput = _('equipoRival');
                     if (locInput) locInput.value = clubNombre;
@@ -509,6 +566,7 @@
 
             Roster = JSON.parse(localStorage.getItem('vRoster_' + empresaID) || '[]');
             S = JSON.parse(localStorage.getItem('vS_' + empresaID) || '[]');
+            HistorialSets = JSON.parse(localStorage.getItem('vHistSets_' + empresaID) || '[]');
             M = JSON.parse(localStorage.getItem('vM_' + empresaID) || '[]');
 
             renderRosterCards();
