@@ -170,7 +170,7 @@
             };
 
             historial.unshift(partidoResumen);
-            if (historial.length > 7) historial.pop(); // Mantener solo los últimos 7
+            if (historial.length > 7) historial.pop();
             localStorage.setItem('vHistorial_' + empresaID, JSON.stringify(historial));
             renderHistorial();
         }
@@ -206,7 +206,7 @@
 
             let d = {};
             Roster.forEach(p => {
-                d[p.key] = { key: p.key, p: 0, n: 0, total: 0, dif: 0, a: {}, name: p.name, num: p.num };
+                d[p.key] = { key: p.key, p: 0, n: 0, total: 0, efectividad: 0, dif: 0, a: {}, name: p.name, num: p.num };
             });
 
             S.forEach(l => {
@@ -224,10 +224,11 @@
             });
 
             Object.values(d).forEach(k => {
+                k.efectividad = k.total > 0 ? Math.round((k.p / k.total) * 100) : 0;
                 k.dif = k.p - k.n;
             });
 
-            // ORDENAR POR MAYOR DIFERENCIAL (P - N)
+            // Ordenado estricto por mayor diferencial
             const listaOrdenada = Object.values(d).sort((a, b) => {
                 if (b.dif !== a.dif) return b.dif - a.dif;
                 return b.p - a.p;
@@ -245,7 +246,8 @@
                                 <span>#${k.num} ${k.name}</span>
                                 <div class="flex items-center gap-1.5">
                                     <span class="px-2 py-0.5 rounded-lg ${k.dif >= 0 ? 'bg-blue-50 text-brand-electric' : 'bg-orange-50 text-brand-orange'} font-mono">Dif: ${k.dif >= 0 ? '+' : ''}${k.dif}</span>
-                                    <span class="px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-black border border-emerald-200 font-mono">Tot (+): ${k.p} | Tot (-): ${k.n}</span>
+                                    <span class="px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-black border border-emerald-200 font-mono">${k.efectividad}% Ef.</span>
+                                    <span class="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-black border border-slate-200 font-mono">Total <span class="text-brand-electric">${k.p}</span> | <span class="text-brand-orange">${k.n}</span></span>
                                 </div>
                             </div>
                             <div class="text-[10px] text-slate-500">${dt || '<span class="italic text-slate-400">Sin jugadas registradas en este set</span>'}</div>
@@ -300,7 +302,7 @@
             let dPartido = {};
 
             Roster.forEach(p => {
-                dPartido[p.key] = { p: 0, n: 0, total: 0, dif: 0, name: p.name, num: p.num };
+                dPartido[p.key] = { p: 0, n: 0, total: 0, efectividad: 0, dif: 0, name: p.name, num: p.num };
             });
 
             M.forEach(l => {
@@ -313,10 +315,11 @@
             });
 
             Object.values(dPartido).forEach(k => {
+                k.efectividad = k.total > 0 ? Math.round((k.p / k.total) * 100) : 0;
                 k.dif = k.p - k.n;
             });
 
-            // ORDENAR CUADRO DE HONOR POR MAYOR DIFERENCIAL
+            // Ordenado estricto por mayor diferencial para el cuadro de honor
             const topCuadro = Object.values(dPartido)
                 .filter(x => x.total > 0)
                 .sort((a, b) => {
@@ -347,17 +350,18 @@
                 }
 
                 grid.innerHTML += `
-                    <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-2 relative overflow-hidden">
+                    <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-2 relative overflow-hidden">
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-md border ${badgeStyle} flex items-center gap-1.5">
+                            <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${badgeStyle} flex items-center gap-1">
                                 ${iconHtml} ${badgeText}
                             </span>
-                            <span class="text-xs font-black text-emerald-600 font-mono">Dif: ${k.dif >= 0 ? '+' : ''}${k.dif}</span>
+                            <span class="text-xs font-black text-emerald-600 font-mono">${k.efectividad}% Ef.</span>
                         </div>
                         <div>
                             <div class="text-xs font-black text-slate-900 truncate">#${k.num} ${k.name}</div>
-                            <div class="text-[10px] text-slate-500 font-semibold mt-0.5">
-                                Puntos (+): <span class="text-brand-electric font-bold">${k.p}</span> | Errores (-): <span class="text-brand-orange font-bold">${k.n}</span>
+                            <div class="flex items-center justify-between text-[10px] font-semibold mt-1">
+                                <span class="font-mono ${k.dif >= 0 ? 'text-brand-electric' : 'text-brand-orange'}">Dif: ${k.dif >= 0 ? '+' : ''}${k.dif}</span>
+                                <span class="font-mono text-slate-600">Total <span class="text-brand-electric font-bold">${k.p}</span> | <span class="text-brand-orange font-bold">${k.n}</span></span>
                             </div>
                         </div>
                     </div>
@@ -473,7 +477,6 @@
             };
         }
 
-        // PDF optimizado que omite gráficas, roster y acciones detalladas
         const btnExpPdf = _('btnExportarPdf');
         if (btnExpPdf) {
             btnExpPdf.onclick = () => {
@@ -481,7 +484,6 @@
             };
         }
 
-        // Inicialización
         async function init() {
             const hoy = new Date();
             const fechaDisplay = _('fechaJuegoDisplay');
