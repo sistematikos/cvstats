@@ -80,7 +80,7 @@
             </div>
         </div>
 
-        <!-- BANNER SUPERIOR CON GLOW Y DEGRADADO -->
+        <!-- BANNER SUPERIOR -->
         <div class="banner-glow mb-2 no-print">
             <div class="rounded-3xl overflow-hidden shadow-2xl relative border border-white/60 bg-slate-950">
                 <img src="img/banner.png" alt="Control Voley Banner" class="w-full h-36 sm:h-44 object-cover opacity-80" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?q=80&w=1600&auto=format&fit=crop'">
@@ -99,7 +99,7 @@
             </div>
         </div>
 
-        <!-- 1. TARJETA DE FECHA Y EQUIPOS -->
+        <!-- 1. FECHA Y EQUIPOS -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-3 border border-slate-200/80">
             <div class="flex justify-between items-center text-xs font-bold text-slate-500">
                 <span id="fechaJuegoDisplay">--/--/----</span>
@@ -119,7 +119,7 @@
             </div>
         </div>
 
-        <!-- 2. TARJETA DE INGRESO Y ROSTER DE ATLETAS -->
+        <!-- 2. ROSTER DE ATLETAS -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 no-print">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
@@ -165,7 +165,7 @@
             </div>
         </div>
 
-        <!-- 3. TARJETA DE REGISTRO TÁCTIL DE ACCIONES (COMPACTAS CON SÍMBOLO) -->
+        <!-- 3. ACCIONES TÁCTILES COMPACTAS -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 no-print">
             <div class="flex justify-between items-center">
                 <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
@@ -183,7 +183,7 @@
                     <span class="text-[10px] font-black uppercase text-slate-700 text-center truncate">Servicio</span>
                     <div class="grid grid-cols-2 gap-1">
                         <button onclick="window.registrarAccionDirecta('Servicio#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">#</button>
-                        <button onclick="window.registrarAccionDirecta('Servicio=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
+                        <button onclick="window.registrarAccionDirecta('Servicio=')" class="py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
                     </div>
                 </div>
                 <!-- Ataque -->
@@ -191,7 +191,7 @@
                     <span class="text-[10px] font-black uppercase text-slate-700 text-center truncate">Ataque</span>
                     <div class="grid grid-cols-2 gap-1">
                         <button onclick="window.registrarAccionDirecta('Ataque#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">#</button>
-                        <button onclick="window.registrarAccionDirecta('Ataque=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
+                        <button onclick="window.registrarAccionDirecta('Ataque=')" class="py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
                     </div>
                 </div>
                 <!-- Bloqueo -->
@@ -199,7 +199,7 @@
                     <span class="text-[10px] font-black uppercase text-slate-700 text-center truncate">Bloqueo</span>
                     <div class="grid grid-cols-2 gap-1">
                         <button onclick="window.registrarAccionDirecta('Bloqueo#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">#</button>
-                        <button onclick="window.registrarAccionDirecta('Bloqueo=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
+                        <button onclick="window.registrarAccionDirecta('Bloqueo=')" class="py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
                     </div>
                 </div>
                 <!-- Recepción -->
@@ -207,7 +207,7 @@
                     <span class="text-[10px] font-black uppercase text-slate-700 text-center truncate">Recepción</span>
                     <div class="grid grid-cols-2 gap-1">
                         <button onclick="window.registrarAccionDirecta('Recepción#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">#</button>
-                        <button onclick="window.registrarAccionDirecta('Recepción=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
+                        <button onclick="window.registrarAccionDirecta('Recepción=')" class="py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
                     </div>
                 </div>
                 <!-- Defensa -->
@@ -215,7 +215,7 @@
                     <span class="text-[10px] font-black uppercase text-slate-700 text-center truncate">Defensa</span>
                     <div class="grid grid-cols-2 gap-1">
                         <button onclick="window.registrarAccionDirecta('Defensa#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">#</button>
-                        <button onclick="window.registrarAccionDirecta('Defensa=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
+                        <button onclick="window.registrarAccionDirecta('Defensa=')" class="py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
                     </div>
                 </div>
                 <!-- Armada -->
@@ -223,7 +223,7 @@
                     <span class="text-[10px] font-black uppercase text-slate-700 text-center truncate">Armada</span>
                     <div class="grid grid-cols-2 gap-1">
                         <button onclick="window.registrarAccionDirecta('Armada+')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">+</button>
-                        <button onclick="window.registrarAccionDirecta('Armada-')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">-</button>
+                        <button onclick="window.registrarAccionDirecta('Armada-')" class="py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">-</button>
                     </div>
                 </div>
             </div>
@@ -238,15 +238,14 @@
             </div>
         </div>
 
-        <!-- 4. TARJETA DE RESUMEN POR ATLETA (CON PESTAÑAS DE SETS) -->
+        <!-- 4. RESUMEN ESTADÍSTICO POR ATLETA (CON PESTAÑAS) -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
                 <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                     <i class="fas fa-users text-brand-electric"></i> Resumen Estadístico por Atleta
                 </h2>
-                <!-- Pestañas para filtrar el resumen por Set o Total -->
                 <div id="resumenTabs" class="flex gap-1 overflow-x-auto w-full sm:w-auto">
-                    <!-- Dinámico: Set Actual, Set 1, Set 2, etc. -->
+                    <!-- Dinámico -->
                 </div>
             </div>
             <div id="st" class="space-y-2 max-h-72 overflow-y-auto pr-1">
@@ -254,21 +253,18 @@
             </div>
         </div>
 
-        <!-- 5. TABLA MATRICIAL POR SETS (1 AL 5) -->
-        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80">
+        <!-- 5. TABLA MATRICIAL DINÁMICA POR SETS (RESPONSIVA) -->
+        <div class="glass-card p-4 sm:p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 overflow-hidden">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-table text-brand-electric"></i> Resumen Matricial por Sets (1 al 5)
             </h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs">
+            <p class="text-[10px] text-slate-400 italic sm:hidden">👉 Desliza la tabla horizontalmente para ver todos los sets.</p>
+            <div class="w-full overflow-x-auto pb-2 scrollbar-thin">
+                <table class="w-full text-left border-collapse text-xs min-w-[550px]">
                     <thead>
                         <tr class="bg-slate-100 text-slate-700 uppercase text-[10px] font-black border-b border-slate-200">
-                            <th class="p-2.5">Atleta</th>
+                            <th class="p-2.5 min-w-[120px]">Atleta</th>
                             <th class="p-2.5 text-center">Set 1</th>
-                            <th class="p-2.5 text-center">Set 2</th>
-                            <th class="p-2.5 text-center">Set 3</th>
-                            <th class="p-2.5 text-center">Set 4</th>
-                            <th class="p-2.5 text-center">Set 5</th>
                             <th class="p-2.5 text-center">Total Partido</th>
                         </tr>
                     </thead>
@@ -279,12 +275,17 @@
             </div>
         </div>
 
-        <!-- 6. TARJETA DE GRÁFICAS ANALÍTICAS -->
+        <!-- 6. GRÁFICAS DE RENDIMIENTO POR SET Y TOTALES -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 no-print">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
-                <i class="fas fa-chart-bar text-brand-electric"></i> Gráficas de Rendimiento
+                <i class="fas fa-chart-bar text-brand-electric"></i> Gráficas de Rendimiento por Set
             </h2>
             <div id="sum" class="text-xs font-bold text-slate-600 text-center"></div>
+            
+            <div class="flex gap-1.5 overflow-x-auto pb-2 scrollbar-thin" id="setGraficasTabs">
+                <!-- Dinámico -->
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="h-56 relative bg-slate-50 p-3 rounded-2xl border border-slate-100">
                     <canvas id="c1"></canvas>
@@ -305,7 +306,7 @@
             </div>
         </div>
 
-        <!-- 8. HISTORIAL DE PARTIDOS (MÁXIMO 7) -->
+        <!-- 8. HISTORIAL DE PARTIDOS -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-3 border border-slate-200/80 no-print">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-history text-slate-700"></i> Historial de Partidos Guardados (Últimos 7)
@@ -317,7 +318,7 @@
 
     </div>
 
-    <!-- NOTIFICACIÓN TOAST -->
+    <!-- TOAST -->
     <div id="toastNotificacion" class="fixed bottom-6 right-6 z-50 transform translate-y-4 opacity-0 transition-all duration-300 pointer-events-none">
         <div class="bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-800">
             <div class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></div>
