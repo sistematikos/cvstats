@@ -87,12 +87,19 @@
             grid.innerHTML = '';
             historial.forEach((h, idx) => {
                 grid.innerHTML += `
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs flex justify-between items-center">
-                        <div>
-                            <span class="font-black text-slate-900">${h.enfrentamiento}</span>
-                            <div class="text-[10px] text-slate-500">Fecha: ${h.fecha} — Sets jugados: ${h.sets?.length || 0}</div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs flex justify-between items-center gap-2">
+                        <div class="cursor-pointer flex-1" onclick="window.cargarPartidoHistorial(${h.id})">
+                            <span class="font-black text-slate-900 hover:text-brand-electric transition">${h.enfrentamiento}</span>
+                            <div class="text-[10px] text-slate-500">Fecha: ${h.fecha} — Sets jugados: ${h.sets?.length || 0} (Acciones: ${h.accionesTotales || 0})</div>
                         </div>
-                        <span class="px-2 py-1 bg-brand-50 text-brand-electric font-bold rounded-lg border border-brand-electric/20">Partido #${idx + 1}</span>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button onclick="window.cargarPartidoHistorial(${h.id})" class="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-electric font-bold rounded-lg border border-brand-electric/20 cursor-pointer" title="Cargar / Ver Partido">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="window.eliminarPartidoHistorial(${h.id})" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-lg border border-rose-200 cursor-pointer" title="Eliminar del Historial">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
                     </div>
                 `;
             });
