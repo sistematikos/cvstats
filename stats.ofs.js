@@ -209,16 +209,26 @@
             tabsContainer.innerHTML = '';
 
             let btnActual = document.createElement('button');
-            btnActual.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap ${setResumenSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+            btnActual.type = 'button';
+            btnActual.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap shrink-0 border ${setResumenSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white border-brand-electric shadow-md' : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'}`;
             btnActual.textContent = `Set Actual (#${HistorialSets.length + 1})`;
-            btnActual.onclick = () => { setResumenSeleccionado = 'ACTUAL'; U(); };
+            btnActual.onclick = (e) => { 
+                e.preventDefault();
+                setResumenSeleccionado = 'ACTUAL'; 
+                U(); 
+            };
             tabsContainer.appendChild(btnActual);
 
             HistorialSets.forEach((_, idx) => {
                 let btnSet = document.createElement('button');
-                btnSet.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap ${setResumenSeleccionado === idx ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+                btnSet.type = 'button';
+                btnSet.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap shrink-0 border ${setResumenSeleccionado === idx ? 'bg-brand-electric text-white border-brand-electric shadow-md' : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'}`;
                 btnSet.textContent = `Set ${idx + 1}`;
-                btnSet.onclick = () => { setResumenSeleccionado = idx; U(); };
+                btnSet.onclick = (e) => { 
+                    e.preventDefault();
+                    setResumenSeleccionado = idx; 
+                    U(); 
+                };
                 tabsContainer.appendChild(btnSet);
             });
         }
@@ -230,16 +240,26 @@
 
             HistorialSets.forEach((_, idx) => {
                 let btnSet = document.createElement('button');
-                btnSet.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap ${setGraficaSeleccionado === idx ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+                btnSet.type = 'button';
+                btnSet.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap shrink-0 border ${setGraficaSeleccionado === idx ? 'bg-brand-electric text-white border-brand-electric shadow-md' : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'}`;
                 btnSet.textContent = `Set ${idx + 1}`;
-                btnSet.onclick = () => { setGraficaSeleccionado = idx; U(); };
+                btnSet.onclick = (e) => { 
+                    e.preventDefault();
+                    setGraficaSeleccionado = idx; 
+                    U(); 
+                };
                 container.appendChild(btnSet);
             });
 
             let btnActual = document.createElement('button');
-            btnActual.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap ${setGraficaSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+            btnActual.type = 'button';
+            btnActual.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap shrink-0 border ${setGraficaSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white border-brand-electric shadow-md' : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'}`;
             btnActual.textContent = `Set Actual (#${HistorialSets.length + 1})`;
-            btnActual.onclick = () => { setGraficaSeleccionado = 'ACTUAL'; U(); };
+            btnActual.onclick = (e) => { 
+                e.preventDefault();
+                setGraficaSeleccionado = 'ACTUAL'; 
+                U(); 
+            };
             container.appendChild(btnActual);
         }
 
