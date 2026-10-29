@@ -299,7 +299,7 @@
             if (locInput) locInput.oninput = e => localStorage.setItem('vLocal_' + empresaID, e.target.value);
             if (rivInput) rivInput.oninput = e => localStorage.setItem('vRival_' + empresaID, e.target.value);
 
-            // 1. PINTAR INMEDIATAMENTE LO QUE HAY EN LOCALSTORAGE (Evita que el móvil quede en blanco)
+            // 1. PINTAR INMEDIATAMENTE LO QUE HAY EN LOCALSTORAGE
             actualizarInterfazGeneral();
             renderHistorial();
 
