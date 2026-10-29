@@ -26,7 +26,6 @@
         const supabase = createClient(supaUrl, supaKey);
 
         let L_Nomina = [];
-        // Carga segura respaldada por múltiples llaves para móviles
         let Roster = JSON.parse(localStorage.getItem('vRoster_' + empresaID) || localStorage.getItem('vRoster_') || '[]');
         let S = JSON.parse(localStorage.getItem('vS_' + empresaID) || localStorage.getItem('vS_') || '[]');
         let HistorialSets = JSON.parse(localStorage.getItem('vHistSets_' + empresaID) || localStorage.getItem('vHistSets_') || '[]');
@@ -104,6 +103,33 @@
                 `;
             });
         }
+
+        window.cargarPartidoHistorial = (idPartido) => {
+            let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
+            const partido = historial.find(x => x.id === idPartido);
+            if (!partido) return;
+
+            if (confirm(`¿Deseas cargar el partido "${partido.enfrentamiento}" del ${partido.fecha} para visualizar sus estadísticas actuales?`)) {
+                HistorialSets = partido.sets ? [...partido.sets] : [];
+                M = partido.datos ? [...partido.datos] : [];
+                S = []; 
+                
+                guardarEstado();
+                actualizarInterfazGeneral();
+                mostrarToast('Partido cargado desde el historial');
+            }
+        };
+
+        window.eliminarPartidoHistorial = (idPartido) => {
+            if (confirm('¿Estás seguro de eliminar este partido del historial del club?')) {
+                let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
+                historial = historial.filter(x => x.id !== idPartido);
+                localStorage.setItem('vHistorial_' + empresaID, JSON.stringify(historial));
+                
+                renderHistorial();
+                mostrarToast('Partido eliminado del historial');
+            }
+        };
 
         function actualizarInterfazGeneral() {
             if (window.CVModuleRoster) {
@@ -277,11 +303,9 @@
             if (locInput) locInput.oninput = e => localStorage.setItem('vLocal_' + empresaID, e.target.value);
             if (rivInput) rivInput.oninput = e => localStorage.setItem('vRival_' + empresaID, e.target.value);
 
-            // 1. RENDERIZADO INMEDIATO EN MÓVIL DESDE LOCALSTORAGE
             actualizarInterfazGeneral();
             renderHistorial();
 
-            // 2. CARGA DE SUPABASE EN SEGUNDO PLANO
             try {
                 const { data: atletas } = await supabase.from('atletas').select('*').order('nroCamiseta', { ascending: true });
                 L_Nomina = atletas || [];
@@ -293,33 +317,6 @@
             }
         }
 
-             window.cargarPartidoHistorial = (idPartido) => {
-            let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
-            const partido = historial.find(x => x.id === idPartido);
-            if (!partido) return;
-
-            if (confirm(`¿Deseas cargar el partido "${partido.enfrentamiento}" del ${partido.fecha} para visualizar sus estadísticas actuales?`)) {
-                HistorialSets = partido.sets ? [...partido.sets] : [];
-                M = partido.datos ? [...partido.datos] : [];
-                S = []; // Limpiar set actual en curso si se va a revisar el histórico
-                
-                guardarEstado();
-                actualizarInterfazGeneral();
-                mostrarToast('Partido cargado desde el historial');
-            }
-        };
-
-        window.eliminarPartidoHistorial = (idPartido) => {
-            if (confirm('¿Estás seguro de eliminar este partido del historial del club?')) {
-                let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
-                historial = historial.filter(x => x.id !== idPartido);
-                localStorage.setItem('vHistorial_' + empresaID, JSON.stringify(historial));
-                
-                renderHistorial();
-                mostrarToast('Partido eliminado del historial');
-            }
-        };
-        
         init();
     });
 })();
