@@ -17,20 +17,11 @@
         tailwind.config = {
           theme: {
             extend: {
-              fontFamily: {
-                sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-              },
+              fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
               colors: {
                 brand: {
-                  50: '#f0f6ff',
-                  100: '#e0edff',
-                  500: '#0066ff',
-                  600: '#0052cc',
-                  700: '#003db3',
-                  electric: '#0055FF',
-                  cyan: '#00D2FF',
-                  orange: '#FF5500',
-                  dark: '#030B1E'
+                  50: '#f0f6ff', 100: '#e0edff', 500: '#0066ff', 600: '#0052cc', 700: '#003db3',
+                  electric: '#0055FF', cyan: '#00D2FF', orange: '#FF5500', dark: '#030B1E'
                 }
               },
               boxShadow: {
@@ -59,15 +50,14 @@
         .banner-glow::after {
             content: '';
             position: absolute;
-            bottom: -15px;
-            left: 5%;
-            width: 90%;
-            height: 30px;
+            bottom: -15px; left: 5%; width: 90%; height: 30px;
             background: linear-gradient(90deg, #0055FF, #00D2FF);
-            filter: blur(20px);
-            opacity: 0.35;
-            z-index: -1;
-            border-radius: 50%;
+            filter: blur(20px); opacity: 0.35; z-index: -1; border-radius: 50%;
+        }
+        @media print {
+            body { background: white !important; padding: 0 !important; }
+            .no-print { display: none !important; }
+            .glass-card { border: none !important; box-shadow: none !important; background: white !important; padding: 0 !important; }
         }
     </style>
 </head>
@@ -76,13 +66,13 @@
     <div class="max-w-5xl mx-auto w-full space-y-6">
 
         <!-- BARRA DE ACCIONES PRINCIPALES Y CERRAR SESIÓN -->
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between no-print">
             <button id="btnCerrarSesion" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl font-bold text-xs shadow-xs flex items-center gap-2 transition border border-rose-200 cursor-pointer">
                 <i class="fas fa-right-from-bracket"></i> Cerrar Sesión
             </button>
             <div class="flex items-center gap-2">
                 <button id="btnExportarPdf" class="px-3 py-2 bg-white/80 hover:bg-white text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-slate-200 shadow-sm cursor-pointer">
-                    <i class="fas fa-print"></i> PDF
+                    <i class="fas fa-print"></i> Reporte PDF
                 </button>
                 <button id="ra" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-slate-200 shadow-sm cursor-pointer">
                     <i class="fas fa-trash-alt"></i> Reset
@@ -91,7 +81,7 @@
         </div>
 
         <!-- BANNER SUPERIOR CON GLOW Y DEGRADADO -->
-        <div class="banner-glow mb-2">
+        <div class="banner-glow mb-2 no-print">
             <div class="rounded-3xl overflow-hidden shadow-2xl relative border border-white/60 bg-slate-950">
                 <img src="img/banner.png" alt="Control Voley Banner" class="w-full h-36 sm:h-44 object-cover opacity-80" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?q=80&w=1600&auto=format&fit=crop'">
                 
@@ -109,13 +99,11 @@
             </div>
         </div>
 
-        <!-- CONTENIDO PRINCIPAL -->
-
         <!-- 1. TARJETA DE FECHA Y EQUIPOS -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-3 border border-slate-200/80">
             <div class="flex justify-between items-center text-xs font-bold text-slate-500">
                 <span id="fechaJuegoDisplay">--/--/----</span>
-                <span class="text-brand-electric font-black uppercase flex items-center gap-1.5">
+                <span class="text-brand-electric font-black uppercase flex items-center gap-1.5 no-print">
                     <span class="w-2 h-2 rounded-full bg-brand-electric animate-ping"></span> Partido en Vivo
                 </span>
             </div>
@@ -132,7 +120,7 @@
         </div>
 
         <!-- 2. TARJETA DE INGRESO Y ROSTER DE ATLETAS -->
-        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80">
+        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 no-print">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                     <span class="w-5 h-5 rounded-lg bg-brand-50 text-brand-electric flex items-center justify-center text-[10px] font-black border border-brand-electric/20">1</span>
@@ -173,12 +161,12 @@
             </div>
 
             <div id="rosterCardsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-h-48 overflow-y-auto p-1 pt-2">
-                <!-- Dinámico -->
+                <!-- Dinámico con número y nombre en la misma línea -->
             </div>
         </div>
 
-        <!-- 3. TARJETA DE REGISTRO TÁCTIL DE ACCIONES -->
-        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80">
+        <!-- 3. TARJETA DE REGISTRO TÁCTIL DE ACCIONES (BOTONES COMPACTOS CON SÍMBOLO ÚNICO) -->
+        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 no-print">
             <div class="flex justify-between items-center">
                 <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                     <span class="w-5 h-5 rounded-lg bg-brand-50 text-brand-electric flex items-center justify-center text-[10px] font-black border border-brand-electric/20">2</span>
@@ -189,61 +177,53 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
                 <!-- Servicio -->
-                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
-                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Servicio</span>
-                    <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="window.registrarAccionDirecta('Servicio#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Punto (#)</button>
-                        <button onclick="window.registrarAccionDirecta('Servicio=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Error (=)</button>
+                <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-200 flex flex-col gap-1.5">
+                    <span class="text-[10px] font-black uppercase text-slate-700 text-center truncate">Servicio</span>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button onclick="window.registrarAccionDirecta('Servicio#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">#</button>
+                        <button onclick="window.registrarAccionDirecta('Servicio=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
                     </div>
                 </div>
                 <!-- Ataque -->
-                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
-                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Ataque</span>
-                    <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="window.registrarAccionDirecta('Ataque#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Punto (#)</button>
-                        <button onclick="window.registrarAccionDirecta('Ataque=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Error (=)</button>
+                <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-200 flex flex-col gap-1.5">
+                    <span class="text-[10px] font-black uppercase text-slate-700 text-center truncate">Ataque</span>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button onclick="window.registrarAccionDirecta('Ataque#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">#</button>
+                        <button onclick="window.registrarAccionDirecta('Ataque=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
                     </div>
                 </div>
                 <!-- Bloqueo -->
-                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
-                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Bloqueo</span>
-                    <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="window.registrarAccionDirecta('Bloqueo#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Punto (#)</button>
-                        <button onclick="window.registrarAccionDirecta('Bloqueo=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Error (=)</button>
-                    </div>
-                </div>
-                <!-- Coloque -->
-                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
-                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Coloque</span>
-                    <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="window.registrarAccionDirecta('Coloque#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Punto (#)</button>
-                        <button onclick="window.registrarAccionDirecta('Coloque=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Error (=)</button>
+                <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-200 flex flex-col gap-1.5">
+                    <span class="text-[10px] font-black uppercase text-slate-700 text-center truncate">Bloqueo</span>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button onclick="window.registrarAccionDirecta('Bloqueo#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">#</button>
+                        <button onclick="window.registrarAccionDirecta('Bloqueo=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
                     </div>
                 </div>
                 <!-- Recepción -->
-                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
-                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Recepción</span>
-                    <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="window.registrarAccionDirecta('Recepción#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Bien (#)</button>
-                        <button onclick="window.registrarAccionDirecta('Recepción=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Mal (=)</button>
+                <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-200 flex flex-col gap-1.5">
+                    <span class="text-[10px] font-black uppercase text-slate-700 text-center truncate">Recepción</span>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button onclick="window.registrarAccionDirecta('Recepción#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">#</button>
+                        <button onclick="window.registrarAccionDirecta('Recepción=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
                     </div>
                 </div>
                 <!-- Defensa -->
-                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
-                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Defensa</span>
-                    <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="window.registrarAccionDirecta('Defensa#')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Bien (#)</button>
-                        <button onclick="window.registrarAccionDirecta('Defensa=')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Mal (=)</button>
+                <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-200 flex flex-col gap-1.5">
+                    <span class="text-[10px] font-black uppercase text-slate-700 text-center truncate">Defensa</span>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button onclick="window.registrarAccionDirecta('Defensa#')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">#</button>
+                        <button onclick="window.registrarAccionDirecta('Defensa=')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">=</button>
                     </div>
                 </div>
-                <!-- Armada (NUEVA ACCIÓN) -->
-                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2 sm:col-span-2">
-                    <span class="text-[11px] font-black uppercase text-slate-700 text-center">Armada</span>
-                    <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="window.registrarAccionDirecta('Armada+')" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Bueno (+)</button>
-                        <button onclick="window.registrarAccionDirecta('Armada-')" class="py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer">Malo (-)</button>
+                <!-- Armada -->
+                <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-200 flex flex-col gap-1.5">
+                    <span class="text-[10px] font-black uppercase text-slate-700 text-center truncate">Armada</span>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button onclick="window.registrarAccionDirecta('Armada+')" class="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">+</button>
+                        <button onclick="window.registrarAccionDirecta('Armada-')" class="py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-lg shadow-xs transition cursor-pointer text-center">-</button>
                     </div>
                 </div>
             </div>
@@ -258,7 +238,7 @@
             </div>
         </div>
 
-        <!-- 4. TARJETA DE RESUMEN POR ATLETA -->
+        <!-- 4. TARJETA DE RESUMEN POR ATLETA (ORDENADO POR DIFERENCIAL Y TOTALES + / -) -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-users text-brand-electric"></i> Resumen Estadístico por Atleta
@@ -269,7 +249,7 @@
         </div>
 
         <!-- 5. TARJETA DE GRÁFICAS ANALÍTICAS -->
-        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80">
+        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 no-print">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-chart-bar text-brand-electric"></i> Gráficas de Rendimiento
             </h2>
@@ -284,12 +264,22 @@
             </div>
         </div>
 
-        <!-- 6. TARJETA DE RECONOCIMIENTOS / CUADRO DE HONOR -->
+        <!-- 6. CUADRO DE HONOR (ORDENADO POR DIFERENCIAL) -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-3 border border-slate-200/80">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-award text-amber-500 text-sm"></i> Cuadro de Honor (Mejores Jugadores)
             </h2>
             <div id="cuadroHonorGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <!-- Dinámico -->
+            </div>
+        </div>
+
+        <!-- 7. HISTORIAL DE PARTIDOS ANTERIORES (MÁXIMO 7) -->
+        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-3 border border-slate-200/80 no-print">
+            <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
+                <i class="fas fa-history text-slate-700"></i> Historial de Partidos Guardados (Últimos 7)
+            </h2>
+            <div id="historialGrid" class="space-y-2 max-h-60 overflow-y-auto">
                 <!-- Dinámico -->
             </div>
         </div>
