@@ -51,7 +51,7 @@
             Defensa: 'Defensa',
             Armada: 'Armada'
         };
-        const P = { b: '#0055FF', o: '#FF5500' };
+        const P = { b: '#0055FF', o: '#e11d48' };
         const K = { scales: { y: { ticks: { stepSize: 1 } } }, responsive: true, maintainAspectRatio: false };
 
         function mostrarToast(mensaje) {
@@ -227,19 +227,19 @@
             if (!container) return;
             container.innerHTML = '';
 
-            let btnActual = document.createElement('button');
-            btnActual.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer ${setGraficaSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
-            btnActual.textContent = `Gráfica Set Actual (#${HistorialSets.length + 1})`;
-            btnActual.onclick = () => { setGraficaSeleccionado = 'ACTUAL'; U(); };
-            container.appendChild(btnActual);
-
             HistorialSets.forEach((_, idx) => {
                 let btnSet = document.createElement('button');
-                btnSet.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer ${setGraficaSeleccionado === idx ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
-                btnSet.textContent = `Gráfica Set ${idx + 1}`;
+                btnSet.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap ${setGraficaSeleccionado === idx ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+                btnSet.textContent = `Set ${idx + 1}`;
                 btnSet.onclick = () => { setGraficaSeleccionado = idx; U(); };
                 container.appendChild(btnSet);
             });
+
+            let btnActual = document.createElement('button');
+            btnActual.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap ${setGraficaSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+            btnActual.textContent = `Set Actual (#${HistorialSets.length + 1})`;
+            btnActual.onclick = () => { setGraficaSeleccionado = 'ACTUAL'; U(); };
+            container.appendChild(btnActual);
         }
 
         function U() {
@@ -305,15 +305,11 @@
                 });
             }
 
-            // TABLA MATRICIAL DINÁMICA (SE ANEXAN COLUMNAS A MEDIDA QUE SE JUEGAN LOS SETS, MÁXIMO 5)
+            // TABLA MATRICIAL DINÁMICA
             const tbodySets = _('tablaSetsBody');
-            const theadSetsRow = _('tablaSetsHeadRow'); // Asegurar ID en el thead de tu HTML o generarlo dinámico
-
-            // Aseguramos que la cantidad de columnas de sets a mostrar dependa de cuántos sets hay guardados + el set actual en curso (mínimo 1, máximo 5)
             let totalSetsJugados = Math.min(5, Math.max(1, HistorialSets.length + (S.length > 0 ? 1 : 0)));
 
             if (tbodySets) {
-                // Actualizar encabezados de la tabla dinámicamente
                 const theadTr = tbodySets.closest('table').querySelector('thead tr');
                 if (theadTr) {
                     let thHtml = `<th class="p-2.5 min-w-[120px]">Atleta</th>`;
@@ -336,7 +332,6 @@
                         let totalP = 0, totalN = 0, totalGlobal = 0;
 
                         for (let i = 0; i < totalSetsJugados; i++) {
-                            // Si el set ya pasó, se lee del historial; si es el actual, se lee de S
                             let accionesSet = (i < HistorialSets.length) ? HistorialSets[i] : S;
                             let setP = 0, setN = 0, setTot = 0;
                             
@@ -376,7 +371,7 @@
                 }
             }
 
-            // GRÁFICAS INDEPENDIENTES POR SET Y ACUMULADAS
+            // GRÁFICAS POR SET INDEPENDIENTE
             const c1El = _('c1');
             const c2El = _('c2');
             if (c1El && c2El) {
@@ -387,7 +382,7 @@
                 let tituloSetLabel = `SET ACTUAL (Set #${HistorialSets.length + 1})`;
                 if (setGraficaSeleccionado !== 'ACTUAL') {
                     accionesGraficaSet = HistorialSets[setGraficaSeleccionado] || [];
-                    tituloSetLabel = `SET #${setGraficaSeleccionado + 1} GUARDADO`;
+                    tituloSetLabel = `SET #${setGraficaSeleccionado + 1} (Guardado)`;
                 }
 
                 const keys = Object.keys(O);
