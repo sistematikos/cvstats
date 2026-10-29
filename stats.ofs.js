@@ -144,16 +144,12 @@
         }
 
         window.registrarAccionDirecta = (accion) => {
-            if (!atletaSeleccionadoKey) {
-                alert("Por favor selecciona un atleta del roster primero (Paso 1).");
-                return;
+            if (window.CVModuleAcciones) {
+                window.CVModuleAcciones.registrarAccion(atletaSeleccionadoKey, accion, N, M, S, () => {
+                    guardarEstado();
+                    actualizarInterfazGeneral();
+                }, mostrarToast);
             }
-            let l = { playerKey: atletaSeleccionadoKey, action: accion };
-            M.push(l);
-            S.push(l);
-            guardarEstado();
-            actualizarInterfazGeneral();
-            mostrarToast(`Registrado: ${accion}`);
         };
 
         const btnAgNom = _('btnAgregarNomina');
@@ -197,16 +193,11 @@
         const btnDeshacer = _('btnDeshacer');
         if (btnDeshacer) {
             btnDeshacer.onclick = () => {
-                if (!S.length && !M.length) {
-                    alert("No hay jugadas registradas para deshacer.");
-                    return;
-                }
-                if (confirm("¿Deseas eliminar la última jugada registrada?")) {
-                    S.pop();
-                    M.pop();
-                    guardarEstado();
-                    actualizarInterfazGeneral();
-                    mostrarToast("Última jugada eliminada");
+                if (window.CVModuleAcciones) {
+                    window.CVModuleAcciones.deshacerAccion(S, M, () => {
+                        guardarEstado();
+                        actualizarInterfazGeneral();
+                    }, mostrarToast);
                 }
             };
         }
@@ -214,49 +205,28 @@
         const rsBtn = _('rs');
         if (rsBtn) {
             rsBtn.onclick = () => {
-                if (confirm('¿Deseas culminar el set actual?')) {
-                    if (S.length > 0) HistorialSets.push([...S]);
-                    S = [];
-                    setResumenSeleccionado = 'ACTUAL';
-                    setGraficaSeleccionado = 'ACTUAL';
-                    guardarEstado();
-                    actualizarInterfazGeneral();
-                    mostrarToast('Set culminado');
+                if (window.CVModuleAcciones) {
+                    window.CVModuleAcciones.culminarSet(HistorialSets, S, () => {
+                        setResumenSeleccionado = 'ACTUAL';
+                        setGraficaSeleccionado = 'ACTUAL';
+                        guardarEstado();
+                        actualizarInterfazGeneral();
+                    }, mostrarToast);
                 }
             };
         }
 
         const btnCulPart = _('btnCulminarPartido');
         if (btnCulPart) {
-            btnCulPart.onclick = () => {
-                if (confirm('¿Deseas culminar el partido y guardar en el historial?')) {
-                    if (S.length > 0 && HistorialSets.length < 5) {
-                        HistorialSets.push([...S]);
-                    }
-                    let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
-                    const loc = _('equipoLocal')?.value || clubNombre;
-                    const riv = _('equipoRival')?.value || 'Rival';
-                    
-                    historial.unshift({
-                        id: Date.now(),
-                        fecha: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-                        enfrentamiento: `${loc} vs ${riv}`,
-                        accionesTotales: M.length,
-                        datos: [...M],
-                        sets: [...HistorialSets]
-                    });
-                    if (historial.length > 7) historial.pop();
-                    localStorage.setItem('vHistorial_' + empresaID, JSON.stringify(historial));
-
-                    S = [];
-                    HistorialSets = [];
-                    M = [];
-                    setResumenSeleccionado = 'ACTUAL';
-                    setGraficaSeleccionado = 'ACTUAL';
-                    guardarEstado();
-                    renderHistorial();
-                    actualizarInterfazGeneral();
-                    mostrarToast('Partido guardado en historial');
+            btnCulPart.onclick = async () => {
+                if (window.CVModuleAcciones) {
+                    await window.CVModuleAcciones.culminarPartido(supabase, empresaID, clubNombre, S, HistorialSets, M, () => {
+                        setResumenSeleccionado = 'ACTUAL';
+                        setGraficaSeleccionado = 'ACTUAL';
+                        guardarEstado();
+                        renderHistorial();
+                        actualizarInterfazGeneral();
+                    }, mostrarToast);
                 }
             };
         }
