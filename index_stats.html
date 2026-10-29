@@ -221,9 +221,18 @@
                     </div>
                 </div>
             </div>
+
+            <div class="flex gap-2 pt-2">
+                <button id="rs" class="w-1/2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">
+                    <i class="fas fa-flag-checkered mr-1"></i> Culminar Set Actual
+                </button>
+                <button id="btnCulminarPartido" class="w-1/2 py-3 bg-slate-800 hover:bg-slate-900 text-white font-black rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">
+                    <i class="fas fa-trophy mr-1 text-amber-400"></i> Culminar Partido
+                </button>
+            </div>
         </div>
 
-        <!-- 4. RESUMEN ESTADÍSTICO CON CONTENEDOR SCROLLER TÁCTIL VISIBLE -->
+        <!-- 4. RESUMEN ESTADÍSTICO -->
         <div class="glass-card p-4 sm:p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80">
             <div class="space-y-2 border-b border-slate-100 pb-3">
                 <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
@@ -245,7 +254,6 @@
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-table text-brand-electric"></i> Resumen Matricial por Sets (1 al 5)
             </h2>
-            <p class="text-[10px] text-slate-400 italic sm:hidden">👉 Desliza la tabla horizontalmente para ver todos los sets.</p>
             <div class="w-full overflow-x-auto pb-2 scrollbar-thin">
                 <table class="w-full text-left border-collapse text-xs min-w-[550px]">
                     <thead>
@@ -262,7 +270,7 @@
             </div>
         </div>
 
-        <!-- 6. GRÁFICAS CON CONTENEDOR SCROLLER TÁCTIL VISIBLE -->
+        <!-- 6. GRÁFICAS -->
         <div class="glass-card p-4 sm:p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 no-print">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-chart-bar text-brand-electric"></i> Gráficas de Rendimiento por Set
@@ -323,15 +331,14 @@
         });
     </script>
 
-   <!-- SCRIPTS MODULARES CON VERSIÓN PARA EVITAR CACHÉ EN MÓVIL -->
-    <script src="stats.rost.ofs.js?v=3.0"></script>
-    <script src="stats.acc.ofs.js?v=3.0"></script>
-    <script src="stats.honor.ofs.js?v=3.0"></script>
-    <script src="stats.graf.ofs.js?v=3.0"></script>
-    <script src="stats.result.ofs.js?v=3.0"></script>
+    <!-- SCRIPTS MODULARES CON VERSIÓN PARA EVITAR CACHÉ EN MÓVIL -->
+    <script src="stats.rost.ofs.js?v=3.4"></script>
+    <script src="stats.acc.ofs.js?v=3.4"></script>
+    <script src="stats.honor.ofs.js?v=3.4"></script>
+    <script src="stats.graf.ofs.js?v=3.4"></script>
+    <script src="stats.result.ofs.js?v=3.4"></script>
     
     <!-- SCRIPT PRINCIPAL COORDINADOR -->
-    <script type="module" src="stats.ofs.js?v=3.0"></script>
-    
+    <script type="module" src="stats.ofs.js?v=3.4"></script>
 </body>
 </html>
