@@ -51,7 +51,8 @@
             Defensa: 'Defensa',
             Armada: 'Armada'
         };
-        const P = { b: '#0055FF', o: '#e11d48' };
+        // Colores exactos: Azul (#0055FF) y Naranja (#FF5500)
+        const P = { b: '#0055FF', o: '#FF5500' };
         const K = { scales: { y: { ticks: { stepSize: 1 } } }, responsive: true, maintainAspectRatio: false };
 
         function mostrarToast(mensaje) {
@@ -208,14 +209,14 @@
             tabsContainer.innerHTML = '';
 
             let btnActual = document.createElement('button');
-            btnActual.className = `px-3 py-1 rounded-xl text-[11px] font-black uppercase transition cursor-pointer ${setResumenSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+            btnActual.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap ${setResumenSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
             btnActual.textContent = `Set Actual (#${HistorialSets.length + 1})`;
             btnActual.onclick = () => { setResumenSeleccionado = 'ACTUAL'; U(); };
             tabsContainer.appendChild(btnActual);
 
             HistorialSets.forEach((_, idx) => {
                 let btnSet = document.createElement('button');
-                btnSet.className = `px-3 py-1 rounded-xl text-[11px] font-black uppercase transition cursor-pointer ${setResumenSeleccionado === idx ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+                btnSet.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap ${setResumenSeleccionado === idx ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
                 btnSet.textContent = `Set ${idx + 1}`;
                 btnSet.onclick = () => { setResumenSeleccionado = idx; U(); };
                 tabsContainer.appendChild(btnSet);
@@ -289,15 +290,15 @@
             } else {
                 listaOrdenada.forEach(k => {
                     let dt = '';
-                    Object.keys(k.a).forEach(x => dt += `<span class="mr-2 font-mono">${x}: <span class="text-brand-electric font-bold">${k.a[x].p}</span>|<span class="text-rose-600 font-bold">${k.a[x].n}</span></span>`);
+                    Object.keys(k.a).forEach(x => dt += `<span class="mr-2 font-mono">${x}: <span class="text-brand-electric font-bold">${k.a[x].p}</span>|<span class="text-orange-600 font-bold">${k.a[x].n}</span></span>`);
                     s.innerHTML += `
                         <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs flex flex-col gap-1 shadow-sm">
                             <div class="flex justify-between items-center font-black text-slate-800">
                                 <span>#${k.num} ${k.name}</span>
                                 <div class="flex items-center gap-1.5">
-                                    <span class="px-2 py-0.5 rounded-lg ${k.dif >= 0 ? 'bg-blue-50 text-brand-electric' : 'bg-rose-50 text-rose-600'} font-mono text-sm font-black">Dif: ${k.dif >= 0 ? '+' : ''}${k.dif}</span>
+                                    <span class="px-2 py-0.5 rounded-lg ${k.dif >= 0 ? 'bg-blue-50 text-brand-electric' : 'bg-orange-50 text-orange-600'} font-mono text-sm font-black">Dif: ${k.dif >= 0 ? '+' : ''}${k.dif}</span>
                                     <span class="px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-black border border-emerald-200 font-mono">${k.efectividad}% Ef.</span>
-                                    <span class="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-black border border-slate-200 font-mono">Total <span class="text-brand-electric">${k.p}</span> | <span class="text-rose-600">${k.n}</span></span>
+                                    <span class="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-black border border-slate-200 font-mono">Total <span class="text-brand-electric">${k.p}</span> | <span class="text-orange-600">${k.n}</span></span>
                                 </div>
                             </div>
                             <div class="text-[10px] text-slate-500">${dt || '<span class="italic text-slate-400">Sin jugadas registradas en este set</span>'}</div>
@@ -350,8 +351,8 @@
                             let setDif = setP - setN;
 
                             htmlCols += `<td class="p-2.5 text-center font-mono">
-                                <div class="text-xs font-black ${setDif >= 0 ? 'text-brand-electric' : 'text-rose-600'}">Dif: ${setDif >= 0 ? '+' : ''}${setDif}</div>
-                                <div class="text-[11px] font-bold text-slate-700"><span class="text-brand-electric">${setP}</span> | <span class="text-rose-600">${setN}</span></div>
+                                <div class="text-xs font-black ${setDif >= 0 ? 'text-brand-electric' : 'text-orange-600'}">Dif: ${setDif >= 0 ? '+' : ''}${setDif}</div>
+                                <div class="text-[11px] font-bold text-slate-700"><span class="text-brand-electric">${setP}</span> | <span class="text-orange-600">${setN}</span></div>
                                 <div class="text-[9px] text-emerald-600 font-bold">${setEf}% Ef.</div>
                             </td>`;
                         }
@@ -360,8 +361,8 @@
                         let totalDif = totalP - totalN;
 
                         htmlCols += `<td class="p-2.5 text-center font-black bg-slate-50/80 font-mono">
-                            <div class="text-xs font-black ${totalDif >= 0 ? 'text-brand-electric' : 'text-rose-600'}">Dif: ${totalDif >= 0 ? '+' : ''}${totalDif}</div>
-                            <div class="text-[11px] font-bold text-slate-900"><span class="text-brand-electric">${totalP}</span> | <span class="text-rose-600">${totalN}</span></div>
+                            <div class="text-xs font-black ${totalDif >= 0 ? 'text-brand-electric' : 'text-orange-600'}">Dif: ${totalDif >= 0 ? '+' : ''}${totalDif}</div>
+                            <div class="text-[11px] font-bold text-slate-900"><span class="text-brand-electric">${totalP}</span> | <span class="text-orange-600">${totalN}</span></div>
                             <div class="text-[9px] text-emerald-600 font-bold">${totalEf}% Ef.</div>
                         </td>`;
 
@@ -371,7 +372,7 @@
                 }
             }
 
-            // GRÁFICAS POR SET INDEPENDIENTE
+            // GRÁFICAS CON COLORES AZUL Y NARANJA
             const c1El = _('c1');
             const c2El = _('c2');
             if (c1El && c2El) {
@@ -411,7 +412,7 @@
                 const riv = rivInput ? rivInput.value || 'Rival' : 'Rival';
                 
                 const sumEl = _('sum');
-                if (sumEl) sumEl.innerHTML = `${loc} vs ${riv} — Sets jugados: <span class="text-brand-electric font-bold">${HistorialSets.length + 1}</span> | Positivos Totales: <span class="text-brand-electric font-bold">${tp}</span> | Negativos Totales: <span class="text-rose-600 font-bold">${tn}</span>`;
+                if (sumEl) sumEl.innerHTML = `${loc} vs ${riv} — Sets jugados: <span class="text-brand-electric font-bold">${HistorialSets.length + 1}</span> | Positivos Totales: <span class="text-brand-electric font-bold">${tp}</span> | Negativos Totales: <span class="text-orange-600 font-bold">${tn}</span>`;
                 
                 if (a) a.destroy();
                 a = new Chart(x2, { type: 'bar', data: { labels: l, datasets: [{ label: 'Positivo (+)', data: v2.p, backgroundColor: P.b }, { label: 'Negativo (-)', data: v2.n, backgroundColor: P.o }] }, options: { ...K, plugins: { title: { display: true, text: 'TOTAL PARTIDO ACUMULADO' } } } });
@@ -483,8 +484,8 @@
                         <div>
                             <div class="text-xs font-black text-slate-900 truncate">#${k.num} ${k.name}</div>
                             <div class="flex items-center justify-between text-[10px] font-semibold mt-1">
-                                <span class="font-mono text-sm font-black ${k.dif >= 0 ? 'text-brand-electric' : 'text-rose-600'}">Dif: ${k.dif >= 0 ? '+' : ''}${k.dif}</span>
-                                <span class="font-mono text-slate-600">Total <span class="text-brand-electric font-bold">${k.p}</span> | <span class="text-rose-600 font-bold">${k.n}</span></span>
+                                <span class="font-mono text-sm font-black ${k.dif >= 0 ? 'text-brand-electric' : 'text-orange-600'}">Dif: ${k.dif >= 0 ? '+' : ''}${k.dif}</span>
+                                <span class="font-mono text-slate-600">Total <span class="text-brand-electric font-bold">${k.p}</span> | <span class="text-orange-600 font-bold">${k.n}</span></span>
                             </div>
                         </div>
                     </div>
