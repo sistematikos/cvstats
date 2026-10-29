@@ -21,8 +21,6 @@ window.CVModuleRoster = (function() {
 
         if (!Roster.length) {
             container.innerHTML = '<div class="col-span-full text-center py-4 text-xs text-slate-400 italic">No hay atletas en el roster del partido.</div>';
-            const badge = document.getElementById('atletaSeleccionadoBadge');
-            if (badge) badge.classList.add('hidden');
             return;
         }
 
@@ -31,50 +29,34 @@ window.CVModuleRoster = (function() {
             const card = document.createElement('div');
             const isSelected = (atletaSeleccionadoKey === p.key);
             
-            // Clases optimizadas para respuesta táctil inmediata en iOS y Android
-            card.className = `relative p-3 rounded-2xl cursor-pointer flex items-center gap-2 card-atleta-item shadow-sm select-none touch-manipulation ${isSelected ? 'card-atleta-selected' : ''}`;
+            card.className = `relative p-3 rounded-2xl cursor-pointer flex flex-col justify-between card-atleta-item shadow-sm select-none ${isSelected ? 'card-atleta-selected' : ''}`;
             
-            // Manejador dual para evitar retrasos en iPhone y Android
-            const handleSelect = (e) => {
+            card.onclick = (e) => {
                 e.preventDefault();
-                e.stopPropagation();
                 callbackSeleccionar(p.key, p.num, p.name);
             };
 
-            card.onclick = handleSelect;
-            card.ontouchend = handleSelect;
-
             card.innerHTML = `
-                <button type="button" class="absolute top-1 right-2 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-rose-600 font-bold text-sm z-10 cursor-pointer touch-manipulation">&times;</button>
-                <span class="px-2 py-0.5 rounded-lg bg-blue-50 text-brand-electric font-black text-xs border border-blue-100 shrink-0">#${p.num}</span>
-                <div class="font-extrabold text-slate-900 text-xs truncate w-full">${p.name}</div>
+                <button type="button" class="absolute top-1 right-2 w-7 h-7 flex items-center justify-center text-slate-300 hover:text-rose-600 font-bold text-sm z-10 cursor-pointer" onclick="event.stopPropagation();">&times;</button>
+                <div class="text-center py-1 pointer-events-none">
+                    <span class="inline-block px-2.5 py-0.5 rounded-lg bg-blue-50 text-brand-electric font-black text-sm mb-1 border border-blue-100">#${p.num}</span>
+                    <div class="font-extrabold text-slate-900 text-xs truncate max-w-full">${p.name}</div>
+                </div>
             `;
-            
-            // Botón de eliminar adaptado para móvil
+
             const btnX = card.querySelector('button');
-            const handleDelete = (e) => {
+            btnX.onclick = (e) => {
                 e.stopPropagation();
                 e.preventDefault();
                 callbackQuitar(p.key);
             };
-            btnX.onclick = handleDelete;
-            btnX.ontouchend = handleDelete;
 
             container.appendChild(card);
         });
     }
 
-    function seleccionarAtleta(key, num, name, callbackUpdate) {
-        const badge = document.getElementById('atletaSeleccionadoBadge');
-        const nombreSel = document.getElementById('nombreAtletaSel');
-        if (badge) badge.classList.remove('hidden');
-        if (nombreSel) nombreSel.textContent = `#${num} ${name}`;
-        if (callbackUpdate) callbackUpdate(key);
-    }
-
     return {
         poblarNominaSelect,
-        renderRosterCards,
-        seleccionarAtleta
+        renderRosterCards
     };
 })();
