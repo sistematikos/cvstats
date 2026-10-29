@@ -31,28 +31,34 @@ window.CVModuleRoster = (function() {
             const card = document.createElement('div');
             const isSelected = (atletaSeleccionadoKey === p.key);
             
-            // Estilos robustos para asegurar respuesta táctil en móvil
-            card.className = `relative p-3 rounded-2xl cursor-pointer flex items-center gap-2 card-atleta-item shadow-sm select-none ${isSelected ? 'card-atleta-selected' : ''}`;
+            // Clases optimizadas para respuesta táctil inmediata en iOS y Android
+            card.className = `relative p-3 rounded-2xl cursor-pointer flex items-center gap-2 card-atleta-item shadow-sm select-none touch-manipulation ${isSelected ? 'card-atleta-selected' : ''}`;
             
-            // Eventos táctiles directos para PC y Móvil
-            card.onclick = (e) => {
+            // Manejador dual para evitar retrasos en iPhone y Android
+            const handleSelect = (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 callbackSeleccionar(p.key, p.num, p.name);
             };
 
+            card.onclick = handleSelect;
+            card.ontouchend = handleSelect;
+
             card.innerHTML = `
-                <button type="button" class="absolute top-1 right-2 w-6 h-6 flex items-center justify-center text-slate-400 hover:text-rose-600 font-bold text-sm z-10 cursor-pointer">&times;</button>
+                <button type="button" class="absolute top-1 right-2 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-rose-600 font-bold text-sm z-10 cursor-pointer touch-manipulation">&times;</button>
                 <span class="px-2 py-0.5 rounded-lg bg-blue-50 text-brand-electric font-black text-xs border border-blue-100 shrink-0">#${p.num}</span>
                 <div class="font-extrabold text-slate-900 text-xs truncate w-full">${p.name}</div>
             `;
             
-            // Botón de eliminar (asociado limpiamente)
+            // Botón de eliminar adaptado para móvil
             const btnX = card.querySelector('button');
-            btnX.onclick = (e) => {
+            const handleDelete = (e) => {
                 e.stopPropagation();
                 e.preventDefault();
                 callbackQuitar(p.key);
             };
+            btnX.onclick = handleDelete;
+            btnX.ontouchend = handleDelete;
 
             container.appendChild(card);
         });
