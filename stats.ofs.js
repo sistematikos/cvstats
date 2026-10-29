@@ -305,12 +305,28 @@
                 });
             }
 
-            // TABLA MATRICIAL POR SETS (DIFERENCIAL DE PRIMERO Y DESTACADO, TOTALES CON POSITIVO AZUL Y NEGATIVO ROJO)
+            // TABLA MATRICIAL DINÁMICA (SE ANEXAN COLUMNAS A MEDIDA QUE SE JUEGAN LOS SETS, MÁXIMO 5)
             const tbodySets = _('tablaSetsBody');
+            const theadSetsRow = _('tablaSetsHeadRow'); // Asegurar ID en el thead de tu HTML o generarlo dinámico
+
+            // Aseguramos que la cantidad de columnas de sets a mostrar dependa de cuántos sets hay guardados + el set actual en curso (mínimo 1, máximo 5)
+            let totalSetsJugados = Math.min(5, Math.max(1, HistorialSets.length + (S.length > 0 ? 1 : 0)));
+
             if (tbodySets) {
+                // Actualizar encabezados de la tabla dinámicamente
+                const theadTr = tbodySets.closest('table').querySelector('thead tr');
+                if (theadTr) {
+                    let thHtml = `<th class="p-2.5 min-w-[120px]">Atleta</th>`;
+                    for (let i = 0; i < totalSetsJugados; i++) {
+                        thHtml += `<th class="p-2.5 text-center">Set ${i + 1}</th>`;
+                    }
+                    thHtml += `<th class="p-2.5 text-center min-w-[90px]">Total Partido</th>`;
+                    theadTr.innerHTML = thHtml;
+                }
+
                 tbodySets.innerHTML = '';
                 if (!Roster.length) {
-                    tbodySets.innerHTML = '<tr><td colspan="7" class="text-center py-3 text-slate-400 italic">Sin atletas en el roster.</td></tr>';
+                    tbodySets.innerHTML = `<tr><td colspan="${totalSetsJugados + 2}" class="text-center py-3 text-slate-400 italic">Sin atletas en el roster.</td></tr>`;
                 } else {
                     Roster.forEach(p => {
                         let tr = document.createElement('tr');
@@ -319,8 +335,9 @@
                         let htmlCols = `<td class="p-2.5 font-bold text-slate-900">#${p.num} ${p.name}</td>`;
                         let totalP = 0, totalN = 0, totalGlobal = 0;
 
-                        for (let i = 0; i < 5; i++) {
-                            let accionesSet = (i === HistorialSets.length) ? S : (HistorialSets[i] || []);
+                        for (let i = 0; i < totalSetsJugados; i++) {
+                            // Si el set ya pasó, se lee del historial; si es el actual, se lee de S
+                            let accionesSet = (i < HistorialSets.length) ? HistorialSets[i] : S;
                             let setP = 0, setN = 0, setTot = 0;
                             
                             accionesSet.forEach(ac => {
@@ -337,15 +354,11 @@
                             let setEf = setTot > 0 ? Math.round((setP / setTot) * 100) : 0;
                             let setDif = setP - setN;
 
-                            if (i > HistorialSets.length) {
-                                htmlCols += `<td class="p-2.5 text-center text-slate-300">-</td>`;
-                            } else {
-                                htmlCols += `<td class="p-2.5 text-center font-mono">
-                                    <div class="text-xs font-black ${setDif >= 0 ? 'text-brand-electric' : 'text-rose-600'}">Dif: ${setDif >= 0 ? '+' : ''}${setDif}</div>
-                                    <div class="text-[11px] font-bold text-slate-700"><span class="text-brand-electric">${setP}</span> | <span class="text-rose-600">${setN}</span></div>
-                                    <div class="text-[9px] text-emerald-600 font-bold">${setEf}% Ef.</div>
-                                </td>`;
-                            }
+                            htmlCols += `<td class="p-2.5 text-center font-mono">
+                                <div class="text-xs font-black ${setDif >= 0 ? 'text-brand-electric' : 'text-rose-600'}">Dif: ${setDif >= 0 ? '+' : ''}${setDif}</div>
+                                <div class="text-[11px] font-bold text-slate-700"><span class="text-brand-electric">${setP}</span> | <span class="text-rose-600">${setN}</span></div>
+                                <div class="text-[9px] text-emerald-600 font-bold">${setEf}% Ef.</div>
+                            </td>`;
                         }
 
                         let totalEf = totalGlobal > 0 ? Math.round((totalP / totalGlobal) * 100) : 0;
