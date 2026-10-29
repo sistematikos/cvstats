@@ -161,11 +161,11 @@
             </div>
 
             <div id="rosterCardsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-h-48 overflow-y-auto p-1 pt-2">
-                <!-- Dinámico con número y nombre en la misma línea -->
+                <!-- Dinámico -->
             </div>
         </div>
 
-        <!-- 3. TARJETA DE REGISTRO TÁCTIL DE ACCIONES (BOTONES COMPACTOS CON SÍMBOLO ÚNICO) -->
+        <!-- 3. TARJETA DE REGISTRO TÁCTIL DE ACCIONES (COMPACTAS CON SÍMBOLO) -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 no-print">
             <div class="flex justify-between items-center">
                 <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
@@ -238,7 +238,7 @@
             </div>
         </div>
 
-        <!-- 4. TARJETA DE RESUMEN POR ATLETA (ORDENADO POR DIFERENCIAL Y TOTALES + / -) -->
+        <!-- 4. TARJETA DE RESUMEN POR ATLETA -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-users text-brand-electric"></i> Resumen Estadístico por Atleta
@@ -248,7 +248,32 @@
             </div>
         </div>
 
-        <!-- 5. TARJETA DE GRÁFICAS ANALÍTICAS -->
+        <!-- 5. TABLA MATRICIAL POR SETS (1 AL 5) -->
+        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80">
+            <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
+                <i class="fas fa-table text-brand-electric"></i> Resumen Matricial por Sets (1 al 5)
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 uppercase text-[10px] font-black border-b border-slate-200">
+                            <th class="p-2.5">Atleta</th>
+                            <th class="p-2.5 text-center">Set 1</th>
+                            <th class="p-2.5 text-center">Set 2</th>
+                            <th class="p-2.5 text-center">Set 3</th>
+                            <th class="p-2.5 text-center">Set 4</th>
+                            <th class="p-2.5 text-center">Set 5</th>
+                            <th class="p-2.5 text-center">Total Partido</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaSetsBody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                        <!-- Dinámico -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 6. TARJETA DE GRÁFICAS ANALÍTICAS -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 no-print">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-chart-bar text-brand-electric"></i> Gráficas de Rendimiento
@@ -264,7 +289,7 @@
             </div>
         </div>
 
-        <!-- 6. CUADRO DE HONOR (ORDENADO POR DIFERENCIAL) -->
+        <!-- 7. CUADRO DE HONOR -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-3 border border-slate-200/80">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-award text-amber-500 text-sm"></i> Cuadro de Honor (Mejores Jugadores)
@@ -274,7 +299,7 @@
             </div>
         </div>
 
-        <!-- 7. HISTORIAL DE PARTIDOS ANTERIORES (MÁXIMO 7) -->
+        <!-- 8. HISTORIAL DE PARTIDOS (MÁXIMO 7) -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-3 border border-slate-200/80 no-print">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-history text-slate-700"></i> Historial de Partidos Guardados (Últimos 7)
@@ -286,7 +311,7 @@
 
     </div>
 
-    <!-- NOTIFICACIÓN TOAST FLOTANTE -->
+    <!-- NOTIFICACIÓN TOAST -->
     <div id="toastNotificacion" class="fixed bottom-6 right-6 z-50 transform translate-y-4 opacity-0 transition-all duration-300 pointer-events-none">
         <div class="bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-800">
             <div class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></div>
@@ -294,7 +319,6 @@
         </div>
     </div>
 
-    <!-- EVENTO DE CERRAR SESIÓN -->
     <script>
         document.getElementById('btnCerrarSesion').addEventListener('click', () => {
             if (confirm('¿Deseas cerrar sesión? Deberás ingresar la licencia nuevamente para activar el sistema.')) {
@@ -304,7 +328,6 @@
         });
     </script>
 
-    <!-- SCRIPT ESTADÍSTICO PRINCIPAL OFUSCADO -->
     <script type="module" src="stats.ofs.js"></script>
 </body>
 </html>
