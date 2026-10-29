@@ -210,7 +210,7 @@
 
             let btnActual = document.createElement('button');
             btnActual.type = 'button';
-            btnActual.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap shrink-0 border ${setResumenSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white border-brand-electric shadow-md' : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'}`;
+            btnActual.className = `px-3.5 py-2 rounded-xl text-xs font-black uppercase transition cursor-pointer whitespace-nowrap shrink-0 shadow-xs ${setResumenSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white shadow-md' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`;
             btnActual.textContent = `Set Actual (#${HistorialSets.length + 1})`;
             btnActual.onclick = (e) => { 
                 e.preventDefault();
@@ -222,7 +222,7 @@
             HistorialSets.forEach((_, idx) => {
                 let btnSet = document.createElement('button');
                 btnSet.type = 'button';
-                btnSet.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap shrink-0 border ${setResumenSeleccionado === idx ? 'bg-brand-electric text-white border-brand-electric shadow-md' : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'}`;
+                btnSet.className = `px-3.5 py-2 rounded-xl text-xs font-black uppercase transition cursor-pointer whitespace-nowrap shrink-0 shadow-xs ${setResumenSeleccionado === idx ? 'bg-brand-electric text-white shadow-md' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`;
                 btnSet.textContent = `Set ${idx + 1}`;
                 btnSet.onclick = (e) => { 
                     e.preventDefault();
@@ -241,7 +241,7 @@
             HistorialSets.forEach((_, idx) => {
                 let btnSet = document.createElement('button');
                 btnSet.type = 'button';
-                btnSet.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap shrink-0 border ${setGraficaSeleccionado === idx ? 'bg-brand-electric text-white border-brand-electric shadow-md' : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'}`;
+                btnSet.className = `px-3.5 py-2 rounded-xl text-xs font-black uppercase transition cursor-pointer whitespace-nowrap shrink-0 shadow-xs ${setGraficaSeleccionado === idx ? 'bg-brand-electric text-white shadow-md' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`;
                 btnSet.textContent = `Set ${idx + 1}`;
                 btnSet.onclick = (e) => { 
                     e.preventDefault();
@@ -253,7 +253,7 @@
 
             let btnActual = document.createElement('button');
             btnActual.type = 'button';
-            btnActual.className = `px-3 py-1.5 rounded-xl text-[11px] font-black uppercase transition cursor-pointer whitespace-nowrap shrink-0 border ${setGraficaSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white border-brand-electric shadow-md' : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'}`;
+            btnActual.className = `px-3.5 py-2 rounded-xl text-xs font-black uppercase transition cursor-pointer whitespace-nowrap shrink-0 shadow-xs ${setGraficaSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white shadow-md' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`;
             btnActual.textContent = `Set Actual (#${HistorialSets.length + 1})`;
             btnActual.onclick = (e) => { 
                 e.preventDefault();
