@@ -35,7 +35,7 @@ window.CVModuleAcciones = (function() {
         }
         if (confirm(`¿Deseas culminar el Set #${HistorialSets.length + 1} y pasar al siguiente?`)) {
             HistorialSets.push([...S]);
-            S.length = 0; // limpiar set actual
+            S.length = 0; 
             callbackActualizar();
             mostrarToast(`Set #${HistorialSets.length} guardado correctamente`);
             return true;
