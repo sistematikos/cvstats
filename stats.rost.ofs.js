@@ -29,15 +29,16 @@ window.CVModuleRoster = (function() {
             const card = document.createElement('div');
             const isSelected = (atletaSeleccionadoKey === p.key);
             
-            // Usamos flex items-center para alinear todo horizontalmente en una sola línea
-            card.className = `relative px-3 py-2.5 rounded-2xl cursor-pointer flex items-center gap-2 card-atleta-item shadow-sm select-none ${isSelected ? 'card-atleta-selected' : ''}`;
+            // Estructura horizontal en una sola línea
+            card.className = `relative px-3 py-2.5 rounded-2xl cursor-pointer flex items-center gap-2.5 card-atleta-item shadow-sm select-none touch-manipulation ${isSelected ? 'card-atleta-selected' : ''}`;
             
-            card.onclick = (e) => {
+            const handleSelect = (e) => {
                 e.preventDefault();
                 callbackSeleccionar(p.key, p.num, p.name);
             };
+            card.onclick = handleSelect;
+            card.ontouchend = handleSelect;
 
-            // Estructura interna en línea pura
             card.innerHTML = `
                 <span class="px-2 py-0.5 rounded-lg bg-blue-50 text-brand-electric font-black text-xs border border-blue-100 shrink-0">#${p.num}</span>
                 <div class="font-extrabold text-slate-900 text-xs truncate w-full pr-6">${p.name}</div>
@@ -45,11 +46,13 @@ window.CVModuleRoster = (function() {
             `;
 
             const btnX = card.querySelector('button');
-            btnX.onclick = (e) => {
+            const handleDelete = (e) => {
                 e.stopPropagation();
                 e.preventDefault();
                 callbackQuitar(p.key);
             };
+            btnX.onclick = handleDelete;
+            btnX.ontouchend = handleDelete;
 
             container.appendChild(card);
         });
