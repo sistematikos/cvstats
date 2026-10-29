@@ -233,14 +233,13 @@
         </div>
 
         <!-- 4. RESUMEN ESTADÍSTICO CON PESTAÑAS TÁCTILES SCROLLABLE -->
-        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80">
-            <div class="flex flex-col gap-2.5 border-b border-slate-100 pb-3">
+        <div class="glass-card p-4 sm:p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80">
+            <div class="space-y-2 border-b border-slate-100 pb-3">
                 <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                     <i class="fas fa-users text-brand-electric"></i> Resumen Estadístico por Atleta
                 </h2>
-                <!-- Contenedor con overflow horizontal optimizado para teléfonos -->
-                <div class="w-full overflow-x-auto pb-1">
-                    <div id="resumenTabs" class="flex gap-1.5 min-w-max">
+                <div class="w-full overflow-x-auto scrollbar-none py-1">
+                    <div id="resumenTabs" class="flex items-center gap-1.5 w-max">
                         <!-- Dinámico -->
                     </div>
                 </div>
@@ -272,16 +271,15 @@
             </div>
         </div>
 
-        <!-- 6. GRÁFICAS CON PESTAÑAS MÓVILES SCROLLABLE Y COLORES AZUL/NARANJA -->
-        <div class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 no-print">
+        <!-- 6. GRÁFICAS CON PESTAÑAS MÓVILES SCROLLABLE -->
+        <div class="glass-card p-4 sm:p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 no-print">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-chart-bar text-brand-electric"></i> Gráficas de Rendimiento por Set
             </h2>
             <div id="sum" class="text-xs font-bold text-slate-600 text-center"></div>
             
-            <!-- Contenedor scroller horizontal para celular -->
-            <div class="w-full overflow-x-auto pb-1">
-                <div class="flex gap-1.5 min-w-max" id="setGraficasTabs">
+            <div class="w-full overflow-x-auto scrollbar-none py-1">
+                <div id="setGraficasTabs" class="flex items-center gap-1.5 w-max">
                     <!-- Dinámico -->
                 </div>
             </div>
