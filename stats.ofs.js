@@ -25,10 +25,11 @@
 
         let L_Nomina = [];
         let Roster = [];
-        let S = [];
-        let HistorialSets = [];
-        let M = [];
+        let S = []; // Set Actual en curso
+        let HistorialSets = []; // Sets anteriores culminados [[set1], [set2]...]
+        let M = []; // Total Partido Acumulado
         let atletaSeleccionadoKey = null;
+        let setResumenSeleccionado = 'ACTUAL'; // 'ACTUAL' o índice 0, 1, 2...
         let b = null, a = null;
         let toastTimeout = null;
 
@@ -200,17 +201,46 @@
             });
         }
 
+        function renderResumenTabs() {
+            const tabsContainer = _('resumenTabs');
+            if (!tabsContainer) return;
+            tabsContainer.innerHTML = '';
+
+            // Botón Set Actual
+            let btnActual = document.createElement('button');
+            btnActual.className = `px-3 py-1 rounded-xl text-[11px] font-black uppercase transition cursor-pointer ${setResumenSeleccionado === 'ACTUAL' ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+            btnActual.textContent = `Set Actual (#${HistorialSets.length + 1})`;
+            btnActual.onclick = () => { setResumenSeleccionado = 'ACTUAL'; U(); };
+            tabsContainer.appendChild(btnActual);
+
+            // Botones por cada set guardado en HistorialSets
+            HistorialSets.forEach((_, idx) => {
+                let btnSet = document.createElement('button');
+                btnSet.className = `px-3 py-1 rounded-xl text-[11px] font-black uppercase transition cursor-pointer ${setResumenSeleccionado === idx ? 'bg-brand-electric text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+                btnSet.textContent = `Set ${idx + 1}`;
+                btnSet.onclick = () => { setResumenSeleccionado = idx; U(); };
+                tabsContainer.appendChild(btnSet);
+            });
+        }
+
         function U() {
+            renderResumenTabs();
             const s = _('st');
             if (!s) return;
             s.innerHTML = '';
+
+            // Seleccionar qué conjunto de acciones evaluar para el Resumen Estadístico
+            let accionesAResumir = S;
+            if (setResumenSeleccionado !== 'ACTUAL') {
+                accionesAResumir = HistorialSets[setResumenSeleccionado] || [];
+            }
 
             let d = {};
             Roster.forEach(p => {
                 d[p.key] = { key: p.key, p: 0, n: 0, total: 0, efectividad: 0, dif: 0, a: {}, name: p.name, num: p.num };
             });
 
-            S.forEach(l => {
+            accionesAResumir.forEach(l => {
                 let k = d[l.playerKey];
                 if (k) {
                     let v = N[l.action];
@@ -255,6 +285,7 @@
                 });
             }
 
+            // TABLA MATRICIAL POR SETS
             const tbodySets = _('tablaSetsBody');
             if (tbodySets) {
                 tbodySets.innerHTML = '';
@@ -485,6 +516,7 @@
                 if (confirm(`¿Deseas culminar el Set #${HistorialSets.length + 1} y pasar al siguiente?`)) {
                     HistorialSets.push([...S]);
                     S = [];
+                    setResumenSeleccionado = 'ACTUAL'; // Al cambiar de set limpia y muestra el nuevo set actual
                     guardarEstado();
                     U();
                     mostrarToast(`Set #${HistorialSets.length} guardado correctamente`);
@@ -503,6 +535,7 @@
                     S = [];
                     HistorialSets = [];
                     M = [];
+                    setResumenSeleccionado = 'ACTUAL';
                     guardarEstado();
                     U();
                     mostrarToast('Partido culminado y guardado en historial');
@@ -521,6 +554,7 @@
                     localStorage.removeItem('vLocal_' + empresaID);
                     localStorage.removeItem('vRival_' + empresaID);
                     Roster = []; S = []; HistorialSets = []; M = []; atletaSeleccionadoKey = null;
+                    setResumenSeleccionado = 'ACTUAL';
                     const locInput = _('equipoLocal');
                     const rivInput = _('equipoRival');
                     if (locInput) locInput.value = clubNombre;
