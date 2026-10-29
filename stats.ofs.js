@@ -293,6 +293,33 @@
             }
         }
 
+             window.cargarPartidoHistorial = (idPartido) => {
+            let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
+            const partido = historial.find(x => x.id === idPartido);
+            if (!partido) return;
+
+            if (confirm(`¿Deseas cargar el partido "${partido.enfrentamiento}" del ${partido.fecha} para visualizar sus estadísticas actuales?`)) {
+                HistorialSets = partido.sets ? [...partido.sets] : [];
+                M = partido.datos ? [...partido.datos] : [];
+                S = []; // Limpiar set actual en curso si se va a revisar el histórico
+                
+                guardarEstado();
+                actualizarInterfazGeneral();
+                mostrarToast('Partido cargado desde el historial');
+            }
+        };
+
+        window.eliminarPartidoHistorial = (idPartido) => {
+            if (confirm('¿Estás seguro de eliminar este partido del historial del club?')) {
+                let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
+                historial = historial.filter(x => x.id !== idPartido);
+                localStorage.setItem('vHistorial_' + empresaID, JSON.stringify(historial));
+                
+                renderHistorial();
+                mostrarToast('Partido eliminado del historial');
+            }
+        };
+        
         init();
     });
 })();
