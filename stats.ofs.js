@@ -2,7 +2,9 @@
     import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm").then(async ({ createClient }) => {
 
         const _ = id => document.getElementById(id);
-        const empresaID = (localStorage.getItem('youcontrol_empresa_id') || '').trim();
+        
+        // Búsqueda flexible de la empresa para evitar fallos en móviles
+        const empresaID = (localStorage.getItem('youcontrol_empresa_id') || localStorage.getItem('control_voley_empresa_id') || '').trim();
         const clubNombre = localStorage.getItem('control_voley_club_nombre') || empresaID || 'Club Voley';
 
         let supaUrl = localStorage.getItem('control_voley_supa_url');
@@ -24,10 +26,11 @@
         const supabase = createClient(supaUrl, supaKey);
 
         let L_Nomina = [];
-        let Roster = JSON.parse(localStorage.getItem('vRoster_' + empresaID) || '[]');
-        let S = JSON.parse(localStorage.getItem('vS_' + empresaID) || '[]');
-        let HistorialSets = JSON.parse(localStorage.getItem('vHistSets_' + empresaID) || '[]');
-        let M = JSON.parse(localStorage.getItem('vM_' + empresaID) || '[]');
+        // Carga segura respaldada por múltiples llaves para móviles
+        let Roster = JSON.parse(localStorage.getItem('vRoster_' + empresaID) || localStorage.getItem('vRoster_') || '[]');
+        let S = JSON.parse(localStorage.getItem('vS_' + empresaID) || localStorage.getItem('vS_') || '[]');
+        let HistorialSets = JSON.parse(localStorage.getItem('vHistSets_' + empresaID) || localStorage.getItem('vHistSets_') || '[]');
+        let M = JSON.parse(localStorage.getItem('vM_' + empresaID) || localStorage.getItem('vM_') || '[]');
         let atletaSeleccionadoKey = null;
         let setResumenSeleccionado = 'ACTUAL'; 
         let setGraficaSeleccionado = 'ACTUAL'; 
@@ -96,7 +99,6 @@
         }
 
         function actualizarInterfazGeneral() {
-            // 1. Roster (Llama al módulo independiente)
             if (window.CVModuleRoster) {
                 window.CVModuleRoster.renderRosterCards(Roster, atletaSeleccionadoKey, (k, num, name) => {
                     atletaSeleccionadoKey = k;
@@ -117,7 +119,6 @@
                 });
             }
 
-            // 2. Resultados y Tablas
             if (window.CVModuleResultados) {
                 window.CVModuleResultados.renderResumenTabs(HistorialSets, setResumenSeleccionado, (nuevoSet) => {
                     setResumenSeleccionado = nuevoSet;
@@ -127,7 +128,6 @@
                 window.CVModuleResultados.renderTablaMatricial(Roster, S, HistorialSets, N);
             }
 
-            // 3. Gráficas
             if (window.CVModuleGraficas) {
                 window.CVModuleGraficas.renderGraficaTabs(HistorialSets, setGraficaSeleccionado, (nuevoSet) => {
                     setGraficaSeleccionado = nuevoSet;
@@ -138,7 +138,6 @@
                 a = resGraficas.a;
             }
 
-            // 4. Cuadro de Honor
             if (window.CVModuleHonor) {
                 window.CVModuleHonor.renderCuadroHonor(Roster, M, N);
             }
@@ -157,7 +156,6 @@
             mostrarToast(`Registrado: ${accion}`);
         };
 
-        // Eventos de botones
         const btnAgNom = _('btnAgregarNomina');
         if (btnAgNom) {
             btnAgNom.onclick = () => {
@@ -287,7 +285,6 @@
             btnExpPdf.onclick = () => window.print();
         }
 
-        // Inicialización
         async function init() {
             const hoy = new Date();
             const fechaDisplay = _('fechaJuegoDisplay');
@@ -303,11 +300,11 @@
             if (locInput) locInput.oninput = e => localStorage.setItem('vLocal_' + empresaID, e.target.value);
             if (rivInput) rivInput.oninput = e => localStorage.setItem('vRival_' + empresaID, e.target.value);
 
-            // 1. Pintar de inmediato lo guardado localmente
+            // 1. RENDERIZADO INMEDIATO EN MÓVIL DESDE LOCALSTORAGE
             actualizarInterfazGeneral();
             renderHistorial();
 
-            // 2. Cargar nómina remota desde Supabase
+            // 2. CARGA DE SUPABASE EN SEGUNDO PLANO
             try {
                 const { data: atletas } = await supabase.from('atletas').select('*').order('nroCamiseta', { ascending: true });
                 L_Nomina = atletas || [];
@@ -315,7 +312,7 @@
                     window.CVModuleRoster.poblarNominaSelect(L_Nomina);
                 }
             } catch (err) {
-                console.error("Error al cargar atletas:", err);
+                console.error("Error al cargar atletas de Supabase:", err);
             }
         }
 
