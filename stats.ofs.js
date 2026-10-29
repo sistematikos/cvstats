@@ -31,11 +31,11 @@
         let b = null, a = null;
         let toastTimeout = null;
 
+        // Mapeo sin "Coloque"
         const N = {
             'Servicio#': 1,  'Servicio=': -1,
             'Ataque#': 1,    'Ataque=': -1,
             'Bloqueo#': 1,   'Bloqueo=': -1,
-            'Coloque#': 1,   'Coloque=': -1,
             'Recepción#': 1, 'Recepción=': -1,
             'Defensa#': 1,   'Defensa=': -1,
             'Armada+': 1,    'Armada-': -1
@@ -45,7 +45,6 @@
             Servicio: 'Servicio', 
             Ataque: 'Ataque', 
             Bloqueo: 'Bloqueo', 
-            Coloque: 'Coloque', 
             Recepción: 'Recepción', 
             Defensa: 'Defensa',
             Armada: 'Armada'
@@ -70,7 +69,6 @@
             }, 2000);
         }
 
-        // Corrección del nombre de la función unificada
         function poblarNominaSelect() {
             const select = _('selectNomina');
             if (!select) return;
@@ -103,15 +101,14 @@
                 const card = document.createElement('div');
                 const isSelected = (atletaSeleccionadoKey === p.key);
                 
-                card.className = `relative p-3 rounded-2xl cursor-pointer flex flex-col justify-between card-atleta-item shadow-sm ${isSelected ? 'card-atleta-selected' : ''}`;
+                card.className = `relative p-2.5 rounded-2xl cursor-pointer flex items-center gap-2 card-atleta-item shadow-sm ${isSelected ? 'card-atleta-selected' : ''}`;
                 card.onclick = () => seleccionarAtleta(p.key, p.num, p.name);
 
+                // Número y nombre en la misma línea
                 card.innerHTML = `
                     <button type="button" class="absolute top-1 right-2 text-slate-300 hover:text-rose-600 font-bold text-xs z-10" onclick="event.stopPropagation(); window.quitarDeRoster('${p.key}')">&times;</button>
-                    <div class="text-center py-1">
-                        <span class="inline-block px-2.5 py-0.5 rounded-lg bg-blue-50 text-brand-electric font-black text-sm mb-1 border border-blue-100">#${p.num}</span>
-                        <div class="font-extrabold text-slate-900 text-xs truncate max-w-full">${p.name}</div>
-                    </div>
+                    <span class="px-2 py-0.5 rounded-lg bg-blue-50 text-brand-electric font-black text-xs border border-blue-100 shrink-0">#${p.num}</span>
+                    <div class="font-extrabold text-slate-900 text-xs truncate w-full">${p.name}</div>
                 `;
                 container.appendChild(card);
             });
@@ -158,6 +155,50 @@
             localStorage.setItem('vM_' + empresaID, JSON.stringify(M));
         }
 
+        function guardarEnHistorial() {
+            if (!M.length) return;
+            let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
+            const loc = _('equipoLocal')?.value || clubNombre;
+            const riv = _('equipoRival')?.value || 'Rival';
+            
+            const partidoResumen = {
+                id: Date.now(),
+                fecha: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                enfrentamiento: `${loc} vs ${riv}`,
+                accionesTotales: M.length,
+                datos: [...M]
+            };
+
+            historial.unshift(partidoResumen);
+            if (historial.length > 7) historial.pop(); // Mantener solo los últimos 7
+            localStorage.setItem('vHistorial_' + empresaID, JSON.stringify(historial));
+            renderHistorial();
+        }
+
+        function renderHistorial() {
+            const grid = _('historialGrid');
+            if (!grid) return;
+            let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
+            
+            if (!historial.length) {
+                grid.innerHTML = '<p class="text-center text-slate-400 text-xs py-2 italic">No hay partidos guardados en el historial.</p>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            historial.forEach((h, idx) => {
+                grid.innerHTML += `
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs flex justify-between items-center">
+                        <div>
+                            <span class="font-black text-slate-900">${h.enfrentamiento}</span>
+                            <div class="text-[10px] text-slate-500">Fecha: ${h.fecha} — Acciones: ${h.accionesTotales}</div>
+                        </div>
+                        <span class="px-2 py-1 bg-brand-50 text-brand-electric font-bold rounded-lg border border-brand-electric/20">Partido #${idx + 1}</span>
+                    </div>
+                `;
+            });
+        }
+
         function U() {
             const s = _('st');
             if (!s) return;
@@ -165,7 +206,7 @@
 
             let d = {};
             Roster.forEach(p => {
-                d[p.key] = { key: p.key, p: 0, n: 0, total: 0, efectividad: 0, a: {}, name: p.name, num: p.num };
+                d[p.key] = { key: p.key, p: 0, n: 0, total: 0, dif: 0, a: {}, name: p.name, num: p.num };
             });
 
             S.forEach(l => {
@@ -183,12 +224,13 @@
             });
 
             Object.values(d).forEach(k => {
-                k.efectividad = k.total > 0 ? Math.round((k.p / k.total) * 100) : 0;
+                k.dif = k.p - k.n;
             });
 
+            // ORDENAR POR MAYOR DIFERENCIAL (P - N)
             const listaOrdenada = Object.values(d).sort((a, b) => {
-                if (b.efectividad !== a.efectividad) return b.efectividad - a.efectividad;
-                return (b.p - b.n) - (a.p - a.n);
+                if (b.dif !== a.dif) return b.dif - a.dif;
+                return b.p - a.p;
             });
 
             if (!Roster.length) {
@@ -202,8 +244,8 @@
                             <div class="flex justify-between items-center font-black text-slate-800">
                                 <span>#${k.num} ${k.name}</span>
                                 <div class="flex items-center gap-1.5">
-                                    <span class="px-2 py-0.5 rounded-lg ${k.p - k.n >= 0 ? 'bg-blue-50 text-brand-electric' : 'bg-orange-50 text-brand-orange'}">Dif: ${k.p - k.n}</span>
-                                    <span class="px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-black border border-emerald-200">${k.efectividad}% Ef.</span>
+                                    <span class="px-2 py-0.5 rounded-lg ${k.dif >= 0 ? 'bg-blue-50 text-brand-electric' : 'bg-orange-50 text-brand-orange'} font-mono">Dif: ${k.dif >= 0 ? '+' : ''}${k.dif}</span>
+                                    <span class="px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-black border border-emerald-200 font-mono">Tot (+): ${k.p} | Tot (-): ${k.n}</span>
                                 </div>
                             </div>
                             <div class="text-[10px] text-slate-500">${dt || '<span class="italic text-slate-400">Sin jugadas registradas en este set</span>'}</div>
@@ -215,7 +257,7 @@
             const c2El = _('c2');
             if (c1El && c2El) {
                 const x1 = c1El.getContext('2d'), x2 = c2El.getContext('2d'), l = Object.values(O);
-                let v1 = { p: [0,0,0,0,0,0,0], n: [0,0,0,0,0,0,0] }, v2 = { p: [0,0,0,0,0,0,0], n: [0,0,0,0,0,0,0] }, tp = 0, tn = 0;
+                let v1 = { p: [0,0,0,0,0,0], n: [0,0,0,0,0,0] }, v2 = { p: [0,0,0,0,0,0], n: [0,0,0,0,0,0] }, tp = 0, tn = 0;
 
                 const keys = Object.keys(O);
                 keys.forEach((k, idx) => {
@@ -258,7 +300,7 @@
             let dPartido = {};
 
             Roster.forEach(p => {
-                dPartido[p.key] = { p: 0, n: 0, total: 0, efectividad: 0, name: p.name, num: p.num };
+                dPartido[p.key] = { p: 0, n: 0, total: 0, dif: 0, name: p.name, num: p.num };
             });
 
             M.forEach(l => {
@@ -271,14 +313,15 @@
             });
 
             Object.values(dPartido).forEach(k => {
-                k.efectividad = k.total > 0 ? Math.round((k.p / k.total) * 100) : 0;
+                k.dif = k.p - k.n;
             });
 
+            // ORDENAR CUADRO DE HONOR POR MAYOR DIFERENCIAL
             const topCuadro = Object.values(dPartido)
                 .filter(x => x.total > 0)
                 .sort((a, b) => {
-                    if (b.efectividad !== a.efectividad) return b.efectividad - a.efectividad;
-                    return (b.p - b.n) - (a.p - a.n);
+                    if (b.dif !== a.dif) return b.dif - a.dif;
+                    return b.p - a.p;
                 })
                 .slice(0, 4);
 
@@ -309,7 +352,7 @@
                             <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-md border ${badgeStyle} flex items-center gap-1.5">
                                 ${iconHtml} ${badgeText}
                             </span>
-                            <span class="text-xs font-black text-emerald-600 font-mono">${k.efectividad}% Ef.</span>
+                            <span class="text-xs font-black text-emerald-600 font-mono">Dif: ${k.dif >= 0 ? '+' : ''}${k.dif}</span>
                         </div>
                         <div>
                             <div class="text-xs font-black text-slate-900 truncate">#${k.num} ${k.name}</div>
@@ -396,12 +439,13 @@
         const btnCulPart = _('btnCulminarPartido');
         if (btnCulPart) {
             btnCulPart.onclick = () => {
-                if (confirm('¿Desea culminar el partido? Esto reseteará todas las acciones y sets a cero, conservando los atletas en el roster.')) {
+                if (confirm('¿Desea culminar el partido? Esto guardará el historial, reseteará las acciones a cero y conservará los atletas en el roster.')) {
+                    guardarEnHistorial();
                     S = [];
                     M = [];
                     guardarEstado();
                     U();
-                    mostrarToast('Partido culminado — Roster conservado');
+                    mostrarToast('Partido culminado y guardado en historial');
                 }
             };
         }
@@ -429,6 +473,7 @@
             };
         }
 
+        // PDF optimizado que omite gráficas, roster y acciones detalladas
         const btnExpPdf = _('btnExportarPdf');
         if (btnExpPdf) {
             btnExpPdf.onclick = () => {
@@ -455,7 +500,7 @@
             try {
                 const { data: atletas } = await supabase.from('atletas').select('*').order('nroCamiseta', { ascending: true });
                 L_Nomina = atletas || [];
-                poblarNominaSelect(); // <-- Llamada corregida correctamente
+                poblarNominaSelect();
             } catch (err) {
                 console.error("Error al cargar atletas:", err);
             }
@@ -465,6 +510,7 @@
             M = JSON.parse(localStorage.getItem('vM_' + empresaID) || '[]');
 
             renderRosterCards();
+            renderHistorial();
             U();
         }
 
