@@ -2,9 +2,7 @@
     import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm").then(async ({ createClient }) => {
 
         const _ = id => document.getElementById(id);
-        
-        // Obtención y validación segura de la empresa
-        const empresaID = (localStorage.getItem('youcontrol_empresa_id') || localStorage.getItem('control_voley_empresa_id') || '').trim();
+        const empresaID = (localStorage.getItem('youcontrol_empresa_id') || '').trim();
         const clubNombre = localStorage.getItem('control_voley_club_nombre') || empresaID || 'Club Voley';
 
         let supaUrl = localStorage.getItem('control_voley_supa_url');
@@ -26,9 +24,9 @@
         const supabase = createClient(supaUrl, supaKey);
 
         let L_Nomina = [];
-        let Roster = JSON.parse(localStorage.getItem('vRoster_' + empresaID) || localStorage.getItem('vRoster_') || '[]');
-        let S = JSON.parse(localStorage.getItem('vS_' + empresaID) || localStorage.getItem('vS_') || '[]');
-        let M = JSON.parse(localStorage.getItem('vM_' + empresaID) || localStorage.getItem('vM_') || '[]');
+        let Roster = [];
+        let S = [];
+        let M = [];
         let atletaSeleccionadoKey = null;
         let b = null, a = null;
         let toastTimeout = null;
@@ -95,18 +93,12 @@
                 const card = document.createElement('div');
                 const isSelected = (atletaSeleccionadoKey === p.key);
                 
-                card.className = `relative p-3 rounded-2xl cursor-pointer flex flex-col justify-between card-atleta-item shadow-sm select-none touch-manipulation ${isSelected ? 'card-atleta-selected' : ''}`;
-                
-                const handleSelect = (e) => {
-                    e.preventDefault();
-                    seleccionarAtleta(p.key, p.num, p.name);
-                };
-                card.onclick = handleSelect;
-                card.ontouchend = handleSelect;
+                card.className = `relative p-3 rounded-2xl cursor-pointer flex flex-col justify-between card-atleta-item shadow-sm ${isSelected ? 'card-atleta-selected' : ''}`;
+                card.onclick = () => seleccionarAtleta(p.key, p.num, p.name);
 
                 card.innerHTML = `
-                    <button type="button" class="absolute top-1 right-2 w-7 h-7 flex items-center justify-center text-slate-300 hover:text-rose-600 font-bold text-sm z-10 cursor-pointer touch-manipulation" onclick="event.stopPropagation(); window.quitarDeRoster('${p.key}')">&times;</button>
-                    <div class="text-center py-1 pointer-events-none">
+                    <button type="button" class="absolute top-1 right-2 text-slate-300 hover:text-rose-600 font-bold text-xs z-10" onclick="event.stopPropagation(); window.quitarDeRoster('${p.key}')">&times;</button>
+                    <div class="text-center py-1">
                         <span class="inline-block px-2.5 py-0.5 rounded-lg bg-blue-50 text-brand-electric font-black text-sm mb-1 border border-blue-100">#${p.num}</span>
                         <div class="font-extrabold text-slate-900 text-xs truncate max-w-full">${p.name}</div>
                     </div>
@@ -450,11 +442,6 @@
             if (locInput) locInput.oninput = e => localStorage.setItem('vLocal_' + empresaID, e.target.value);
             if (rivInput) rivInput.oninput = e => localStorage.setItem('vRival_' + empresaID, e.target.value);
 
-            // 1. CARGAR LAS TARJETAS Y DATOS DESDE LOCALSTORAGE DE INMEDIATO
-            renderRosterCards();
-            U();
-
-            // 2. CARGAR NÓMINA DESDE SUPABASE EN SEGUNDO PLANO
             try {
                 const { data: atletas } = await supabase.from('atletas').select('*').order('nroCamiseta', { ascending: true });
                 L_Nomina = atletas || [];
@@ -462,6 +449,13 @@
             } catch (err) {
                 console.error("Error al cargar atletas:", err);
             }
+
+            Roster = JSON.parse(localStorage.getItem('vRoster_' + empresaID) || '[]');
+            S = JSON.parse(localStorage.getItem('vS_' + empresaID) || '[]');
+            M = JSON.parse(localStorage.getItem('vM_' + empresaID) || '[]');
+
+            renderRosterCards();
+            U();
         }
 
         init();
