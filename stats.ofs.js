@@ -264,7 +264,7 @@
             };
         }
 
-        // BOTÓN EXPORTAR / REPORTE PDF CON MARGEN IZQUIERDO CORREGIDO
+        // BOTÓN EXPORTAR / REPORTE PDF CON ALINEACIÓN SIMÉTRICA (CENTRADO PERFECTO)
         const btnExpPdf = _('btnExportarPdf');
         if (btnExpPdf) {
             const generarPdfMovil = async (e) => {
@@ -275,19 +275,20 @@
                 const rival = _('equipoRival')?.value || 'Rival';
                 const nombreArchivo = `Reporte_${local}_vs_${rival}.pdf`.replace(/\s+/g, '_');
 
-                // 💡 Reducimos y ajustamos los márgenes milimétricos del documento (arriba/abajo, izquierdo/derecho)
                 const opciones = {
-                    margin:       [10, 6, 10, 6], // [superior, derecho, inferior, izquierdo] en mm
+                    margin:       [10, 8, 10, 8], // Márgenes simétricos equilibrados (izq y der de 8mm)
                     filename:     nombreArchivo,
                     image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 800 },
+                    html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 794 }, // Ancho exacto A4 en px
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
 
                 const elementoReporte = document.createElement('div');
                 elementoReporte.style.width = '100%';
+                elementoReporte.style.maxWidth = '100%';
                 elementoReporte.style.boxSizing = 'border-box';
-                elementoReporte.style.padding = '0px 5px'; // Padding interno mínimo para aprovechar todo el ancho
+                elementoReporte.style.padding = '0';
+                elementoReporte.style.margin = '0 auto';
                 elementoReporte.style.background = '#ffffff';
                 elementoReporte.style.color = '#000000';
                 elementoReporte.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
@@ -329,12 +330,20 @@
                 tarjetasOrdenadas.forEach((card) => {
                     const clon = card.cloneNode(true);
                     clon.querySelectorAll('button, .no-print').forEach(el => el.remove());
-                    clon.style.marginBottom = '20px';
+                    
+                    // 💡 Limpiamos clases de margen o posicionamiento web que desalineen el PDF
+                    clon.className = ''; 
                     clon.style.width = '100%';
+                    clon.style.maxWidth = '100%';
+                    clon.style.margin = '0 0 20px 0';
+                    clon.style.padding = '10px';
                     clon.style.boxSizing = 'border-box';
+                    clon.style.background = '#ffffff';
+                    clon.style.border = '1px solid #e2e8f0';
+                    clon.style.borderRadius = '12px';
                     clon.style.pageBreakInside = 'avoid';
 
-                    // Forzamos altura automática y removemos límites de scroll (max-height)
+                    // Forzamos altura automática y removemos límites de scroll
                     clon.style.maxHeight = 'none';
                     clon.style.overflow = 'visible';
                     clon.style.height = 'auto';
@@ -343,6 +352,7 @@
                         scrollEl.style.maxHeight = 'none';
                         scrollEl.style.overflow = 'visible';
                         scrollEl.style.height = 'auto';
+                        scrollEl.style.width = '100%';
                     });
 
                     if (card.querySelector('canvas')) {
@@ -358,6 +368,8 @@
                                 const urlImagen = canvasOrig.toDataURL('image/png');
                                 const img = document.createElement('img');
                                 img.src = urlImagen;
+                                img.style.display = 'block';
+                                img.style.margin = '0 auto';
                                 img.style.maxWidth = '100%';
                                 img.style.height = 'auto';
                                 canvasClonados[index].replaceWith(img);
