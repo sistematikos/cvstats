@@ -185,25 +185,6 @@
             }
         };
 
-        const btnAgNom = _('btnAgregarNomina');
-        if (btnAgNom) {
-            btnAgNom.onclick = () => {
-                const idKey = _('selectNomina').value;
-                if (!idKey) return;
-                const atleta = L_Nomina.find(x => (x.cedulaIdentidad || x.id) == idKey);
-                if (atleta && !Roster.some(x => x.key == idKey)) {
-                    Roster.push({
-                        key: idKey,
-                        num: atleta.nroCamiseta || '0',
-                        name: `${atleta.nombre} ${atleta.apellido || ''}`.trim()
-                    });
-                    guardarEstado();
-                    actualizarInterfazGeneral();
-                    mostrarToast('Atleta añadido al Roster');
-                }
-            };
-        }
-
         const btnAgMan = _('btnAgregarManual');
         if (btnAgMan) {
             btnAgMan.onclick = () => {
@@ -219,7 +200,7 @@
 
                 guardarEstado();
                 actualizarInterfazGeneral();
-                mostrarToast('Atleta invitado añadido');
+                mostrarToast('Atleta añadido al Roster');
             };
         }
 
@@ -300,6 +281,38 @@
             btnExpPdf.addEventListener('touchend', dispararImpresion);
         }
 
+        // NUEVO BOTÓN: FORZAR ACTUALIZACIÓN Y BORRAR CACHÉ MÓVIL
+        const btnActualizarApp = _('btnForzarActualizacion');
+        if (btnActualizarApp) {
+            const forzarReload = async (e) => {
+                e.preventDefault();
+                if (confirm('¿Deseas buscar e instalar la versión más reciente del sistema?')) {
+                    try {
+                        if ('serviceWorker' in navigator) {
+                            const registrations = await navigator.serviceWorker.getRegistrations();
+                            for (let registration of registrations) {
+                                await registration.unregister();
+                            }
+                        }
+                        if ('caches' in window) {
+                            const cacheNames = await caches.keys();
+                            for (let name of cacheNames) {
+                                await caches.delete(name);
+                            }
+                        }
+                        mostrarToast('Actualizando sistema...');
+                        setTimeout(() => {
+                            window.location.reload(true);
+                        }, 800);
+                    } catch (err) {
+                        window.location.reload(true);
+                    }
+                }
+            };
+            btnActualizarApp.addEventListener('click', forzarReload);
+            btnActualizarApp.addEventListener('touchend', forzarReload);
+        }
+
         async function init() {
             const hoy = new Date();
             const fechaDisplay = _('fechaJuegoDisplay');
@@ -317,16 +330,6 @@
 
             actualizarInterfazGeneral();
             renderHistorial();
-
-            try {
-                const { data: atletas } = await supabase.from('atletas').select('*').order('nroCamiseta', { ascending: true });
-                L_Nomina = atletas || [];
-                if (window.CVModuleRoster) {
-                    window.CVModuleRoster.poblarNominaSelect(L_Nomina);
-                }
-            } catch (err) {
-                console.error("Error al cargar atletas de Supabase:", err);
-            }
         }
 
         init();
