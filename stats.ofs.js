@@ -264,7 +264,7 @@
             };
         }
 
-        // BOTÓN EXPORTAR / REPORTE PDF REAL CON CONVERSIÓN DE GRÁFICAS
+        // BOTÓN EXPORTAR / REPORTE PDF CON ESPACIADO CORREGIDO
         const btnExpPdf = _('btnExportarPdf');
         if (btnExpPdf) {
             const generarPdfMovil = async (e) => {
@@ -290,7 +290,7 @@
                 elementoReporte.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
 
                 elementoReporte.innerHTML = `
-                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0055FF; padding-bottom: 10px;">
+                    <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #0055FF; padding-bottom: 10px;">
                         <h2 style="font-size: 18px; font-weight: 900; color: #030B1E; margin: 0;">CONTROL VOLEY PRO - REPORTE OFICIAL</h2>
                         <p style="font-size: 14px; font-weight: 700; color: #0055FF; margin: 5px 0 0 0;">${local} vs ${rival}</p>
                     </div>
@@ -303,7 +303,11 @@
                         const clon = card.cloneNode(true);
                         clon.querySelectorAll('button, .no-print').forEach(el => el.remove());
 
-                        // TRUCO CLAVE: Convertimos los canvas originales en imágenes estéticas para el clon
+                        // Damos aire adicional a las tarjetas, especialmente a la de gráficas
+                        clon.style.marginBottom = '25px';
+                        clon.style.pageBreakInside = 'avoid';
+
+                        // Convertimos los canvas originales en imágenes estéticas para el clon
                         const canvasOriginales = card.querySelectorAll('canvas');
                         const canvasClonados = clon.querySelectorAll('canvas');
                         
