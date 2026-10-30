@@ -264,7 +264,7 @@
             };
         }
 
-        // BOTÓN EXPORTAR / REPORTE PDF CON ALINEACIÓN SIMÉTRICA (CENTRADO PERFECTO)
+        // BOTÓN EXPORTAR / REPORTE PDF CON DISEÑO ESTÁTICO Y CENTRADO PERFECTO
         const btnExpPdf = _('btnExportarPdf');
         if (btnExpPdf) {
             const generarPdfMovil = async (e) => {
@@ -275,28 +275,30 @@
                 const rival = _('equipoRival')?.value || 'Rival';
                 const nombreArchivo = `Reporte_${local}_vs_${rival}.pdf`.replace(/\s+/g, '_');
 
+                // Configuramos los márgenes simétricos exactos en el motor PDF
                 const opciones = {
-                    margin:       [10, 8, 10, 8], // Márgenes simétricos equilibrados (izq y der de 8mm)
+                    margin:       [8, 8, 8, 8], // [superior, derecho, inferior, izquierdo] en mm
                     filename:     nombreArchivo,
                     image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 794 }, // Ancho exacto A4 en px
+                    html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 800 },
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
 
+                // Contenedor principal con ancho fijo controlado para evitar desbordes
                 const elementoReporte = document.createElement('div');
-                elementoReporte.style.width = '100%';
-                elementoReporte.style.maxWidth = '100%';
-                elementoReporte.style.boxSizing = 'border-box';
-                elementoReporte.style.padding = '0';
+                elementoReporte.style.width = '700px'; // Ancho base fijo ideal para A4
                 elementoReporte.style.margin = '0 auto';
+                elementoReporte.style.padding = '10px';
                 elementoReporte.style.background = '#ffffff';
                 elementoReporte.style.color = '#000000';
                 elementoReporte.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
+                elementoReporte.style.boxSizing = 'border-box';
 
+                // Cabecera limpia y centrada
                 elementoReporte.innerHTML = `
                     <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0055FF; padding-bottom: 10px; width: 100%;">
-                        <h2 style="font-size: 18px; font-weight: 900; color: #030B1E; margin: 0;">CONTROL VOLEY PRO - REPORTE OFICIAL</h2>
-                        <p style="font-size: 14px; font-weight: 700; color: #0055FF; margin: 5px 0 0 0;">${local} vs ${rival}</p>
+                        <h2 style="font-size: 16px; font-weight: 900; color: #030B1E; margin: 0;">CONTROL VOLEY PRO - REPORTE OFICIAL</h2>
+                        <p style="font-size: 13px; font-weight: 700; color: #0055FF; margin: 5px 0 0 0;">${local} vs ${rival}</p>
                     </div>
                 `;
 
@@ -331,34 +333,46 @@
                     const clon = card.cloneNode(true);
                     clon.querySelectorAll('button, .no-print').forEach(el => el.remove());
                     
-                    // 💡 Limpiamos clases de margen o posicionamiento web que desalineen el PDF
+                    // Forzamos estilos simétricos absolutos para el PDF
                     clon.className = ''; 
                     clon.style.width = '100%';
                     clon.style.maxWidth = '100%';
-                    clon.style.margin = '0 0 20px 0';
-                    clon.style.padding = '10px';
+                    clon.style.margin = '0 0 15px 0';
+                    clon.style.padding = '12px';
                     clon.style.boxSizing = 'border-box';
                     clon.style.background = '#ffffff';
-                    clon.style.border = '1px solid #e2e8f0';
-                    clon.style.borderRadius = '12px';
+                    clon.style.border = '1px solid #cbd5e1';
+                    clon.style.borderRadius = '8px';
                     clon.style.pageBreakInside = 'avoid';
+                    clon.style.boxShadow = 'none';
 
-                    // Forzamos altura automática y removemos límites de scroll
+                    // Limpieza total de restricciones de altura y scroll en los clones
                     clon.style.maxHeight = 'none';
                     clon.style.overflow = 'visible';
                     clon.style.height = 'auto';
 
-                    clon.querySelectorAll('[class*="max-h-"], [class*="overflow-y-auto"]').forEach(scrollEl => {
-                        scrollEl.style.maxHeight = 'none';
-                        scrollEl.style.overflow = 'visible';
-                        scrollEl.style.height = 'auto';
-                        scrollEl.style.width = '100%';
+                    clon.querySelectorAll('[class*="max-h-"], [class*="overflow-y-auto"], [class*="grid"]').forEach(el => {
+                        el.style.maxHeight = 'none';
+                        el.style.overflow = 'visible';
+                        el.style.height = 'auto';
+                        el.style.width = '100%';
+                    });
+
+                    // Si la tarjeta contiene los inputs de equipos o elementos de cabecera, los estilizamos planos
+                    clon.querySelectorAll('input').forEach(input => {
+                        const val = input.value || '';
+                        const span = document.createElement('span');
+                        span.style.fontWeight = 'bold';
+                        span.style.fontSize = '12px';
+                        span.textContent = val;
+                        input.replaceWith(span);
                     });
 
                     if (card.querySelector('canvas')) {
                         clon.style.pageBreakBefore = 'always';
                     }
 
+                    // Conversión nítida de gráficas (canvas a imagen centrada)
                     const canvasOriginales = card.querySelectorAll('canvas');
                     const canvasClonados = clon.querySelectorAll('canvas');
                     
@@ -370,7 +384,7 @@
                                 img.src = urlImagen;
                                 img.style.display = 'block';
                                 img.style.margin = '0 auto';
-                                img.style.maxWidth = '100%';
+                                img.style.maxWidth = '90%';
                                 img.style.height = 'auto';
                                 canvasClonados[index].replaceWith(img);
                             } catch (err) {
