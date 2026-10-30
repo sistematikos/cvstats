@@ -59,7 +59,6 @@
         @media print {
             body { background: white !important; padding: 0 !important; color: black !important; }
             
-            /* Ocultamos navegación, roster, acciones táctiles e historial */
             .no-print,
             #bloqueRoster,
             #bloqueAcciones,
@@ -67,7 +66,6 @@
                 display: none !important; 
             }
 
-            /* Estilo limpio para las tarjetas que sí se van a imprimir (Resultados, Gráficas, Honor) */
             .glass-card { 
                 border: none !important; 
                 box-shadow: none !important; 
@@ -142,44 +140,28 @@
             </div>
         </div>
 
-        <!-- 2. ROSTER (Se oculta al exportar) -->
+        <!-- 2. ROSTER (Solo Ingreso Manual) -->
         <div id="bloqueRoster" class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 no-print">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                     <span class="w-5 h-5 rounded-lg bg-brand-50 text-brand-electric flex items-center justify-center text-[10px] font-black border border-brand-electric/20">1</span>
-                    Roster de Atletas (<span id="countRoster">0</span>)
+                    Roster de Atletas Manual (<span id="countRoster">0</span>)
                 </h2>
                 <span id="atletaSeleccionadoBadge" class="hidden px-2.5 py-1 rounded-xl bg-brand-50 text-brand-electric text-xs font-black border border-brand-electric/30 animate-pulse">
                     Activo: <span id="nombreAtletaSel">Ninguno</span>
                 </span>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="space-y-1.5">
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                        <i class="fas fa-list-check text-brand-electric mr-1"></i> Ingreso desde Nómina del Club
-                    </label>
-                    <div class="flex gap-2">
-                        <select id="selectNomina" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-brand-electric">
-                            <option value="">Seleccione de Nómina...</option>
-                        </select>
-                        <button id="btnAgregarNomina" class="px-4 py-2.5 bg-brand-electric hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-electric transition cursor-pointer">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="space-y-1.5">
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                        <i class="fas fa-user-plus text-slate-700 mr-1"></i> Ingreso Manual de Atletas
-                    </label>
-                    <div class="flex gap-2">
-                        <input type="number" id="manualNum" placeholder="#" class="w-16 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-center font-bold outline-none focus:ring-2 focus:ring-brand-electric">
-                        <input type="text" id="manualNom" placeholder="Nombre Invitado" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-brand-electric">
-                        <button id="btnAgregarManual" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs transition cursor-pointer">
-                            <i class="fas fa-user-plus"></i>
-                        </button>
-                    </div>
+            <div class="space-y-1.5 max-w-xl">
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                    <i class="fas fa-user-plus text-slate-700 mr-1"></i> Agregar Atleta al Roster (Número y Nombre)
+                </label>
+                <div class="flex gap-2">
+                    <input type="number" id="manualNum" placeholder="#" class="w-16 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-center font-bold outline-none focus:ring-2 focus:ring-brand-electric">
+                    <input type="text" id="manualNom" placeholder="Nombre y Apellido del Atleta" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-brand-electric">
+                    <button id="btnAgregarManual" class="px-5 py-2.5 bg-brand-electric hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-electric transition cursor-pointer shrink-0">
+                        <i class="fas fa-user-plus mr-1"></i> Agregar
+                    </button>
                 </div>
             </div>
 
@@ -188,7 +170,7 @@
             </div>
         </div>
 
-        <!-- 3. ACCIONES TÁCTILES (Se oculta al exportar) -->
+        <!-- 3. ACCIONES TÁCTILES -->
         <div id="bloqueAcciones" class="glass-card p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 no-print">
             <div class="flex justify-between items-center">
                 <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
@@ -255,7 +237,7 @@
             </div>
         </div>
 
-        <!-- 4. RESUMEN ESTADÍSTICO (Se incluye en el PDF) -->
+        <!-- 4. RESUMEN ESTADÍSTICO -->
         <div class="glass-card p-4 sm:p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80">
             <div class="space-y-2 border-b border-slate-100 pb-3">
                 <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
@@ -272,7 +254,7 @@
             </div>
         </div>
 
-        <!-- 5. TABLA MATRICIAL DINÁMICA (Se incluye en el PDF) -->
+        <!-- 5. TABLA MATRICIAL DINÁMICA -->
         <div class="glass-card p-4 sm:p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80 overflow-hidden">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-table text-brand-electric"></i> Resumen Matricial por Sets (1 al 5)
@@ -293,7 +275,7 @@
             </div>
         </div>
 
-        <!-- 6. GRÁFICAS (Se incluye en el PDF) -->
+        <!-- 6. GRÁFICAS -->
         <div class="glass-card p-4 sm:p-5 rounded-3xl shadow-glass space-y-4 border border-slate-200/80">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-chart-bar text-brand-electric"></i> Gráficas de Rendimiento por Set
@@ -316,7 +298,7 @@
             </div>
         </div>
 
-        <!-- 7. CUADRO DE HONOR (Se incluye en el PDF) -->
+        <!-- 7. CUADRO DE HONOR -->
         <div class="glass-card p-5 rounded-3xl shadow-glass space-y-3 border border-slate-200/80">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-award text-amber-500 text-sm"></i> Cuadro de Honor (Mejores Jugadores)
@@ -326,7 +308,7 @@
             </div>
         </div>
 
-        <!-- 8. HISTORIAL (Se oculta al exportar) -->
+        <!-- 8. HISTORIAL -->
         <div id="bloqueHistorial" class="glass-card p-5 rounded-3xl shadow-glass space-y-3 border border-slate-200/80 no-print">
             <h2 class="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
                 <i class="fas fa-history text-slate-700"></i> Historial de Partidos Guardados (Últimos 7)
@@ -355,13 +337,13 @@
     </script>
 
     <!-- SCRIPTS MODULARES CON VERSIÓN PARA EVITAR CACHÉ EN MÓVIL -->
-    <script src="stats.rost.ofs.js?v=3.6"></script>
-    <script src="stats.acc.ofs.js?v=3.6"></script>
-    <script src="stats.honor.ofs.js?v=3.6"></script>
-    <script src="stats.graf.ofs.js?v=3.6"></script>
-    <script src="stats.result.ofs.js?v=3.6"></script>
+    <script src="stats.rost.ofs.js?v=3.8"></script>
+    <script src="stats.acc.ofs.js?v=3.8"></script>
+    <script src="stats.honor.ofs.js?v=3.8"></script>
+    <script src="stats.graf.ofs.js?v=3.8"></script>
+    <script src="stats.result.ofs.js?v=3.8"></script>
     
     <!-- SCRIPT PRINCIPAL COORDINADOR -->
-    <script type="module" src="stats.ofs.js?v=3.6"></script>
+    <script type="module" src="stats.ofs.js?v=3.8"></script>
 </body>
 </html>
