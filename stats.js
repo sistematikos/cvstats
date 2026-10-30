@@ -2,7 +2,9 @@
     import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm").then(async ({ createClient }) => {
 
         const _ = id => document.getElementById(id);
-        const empresaID = (localStorage.getItem('youcontrol_empresa_id') || '').trim();
+        
+        // Búsqueda flexible de la empresa para evitar fallos en móviles
+        const empresaID = (localStorage.getItem('youcontrol_empresa_id') || localStorage.getItem('control_voley_empresa_id') || '').trim();
         const clubNombre = localStorage.getItem('control_voley_club_nombre') || empresaID || 'Club Voley';
 
         let supaUrl = localStorage.getItem('control_voley_supa_url');
@@ -24,10 +26,13 @@
         const supabase = createClient(supaUrl, supaKey);
 
         let L_Nomina = [];
-        let Roster = [];
-        let S = [];
-        let M = [];
+        let Roster = JSON.parse(localStorage.getItem('vRoster_' + empresaID) || localStorage.getItem('vRoster_') || '[]');
+        let S = JSON.parse(localStorage.getItem('vS_' + empresaID) || localStorage.getItem('vS_') || '[]');
+        let HistorialSets = JSON.parse(localStorage.getItem('vHistSets_' + empresaID) || localStorage.getItem('vHistSets_') || '[]');
+        let M = JSON.parse(localStorage.getItem('vM_' + empresaID) || localStorage.getItem('vM_') || '[]');
         let atletaSeleccionadoKey = null;
+        let setResumenSeleccionado = 'ACTUAL'; 
+        let setGraficaSeleccionado = 'ACTUAL'; 
         let b = null, a = null;
         let toastTimeout = null;
 
@@ -35,22 +40,13 @@
             'Servicio#': 1,  'Servicio=': -1,
             'Ataque#': 1,    'Ataque=': -1,
             'Bloqueo#': 1,   'Bloqueo=': -1,
-            'Coloque#': 1,   'Coloque=': -1,
             'Recepción#': 1, 'Recepción=': -1,
             'Defensa#': 1,   'Defensa=': -1,
             'Armada+': 1,    'Armada-': -1
         };
 
-        const O = { 
-            Servicio: 'Servicio', 
-            Ataque: 'Ataque', 
-            Bloqueo: 'Bloqueo', 
-            Coloque: 'Coloque', 
-            Recepción: 'Recepción', 
-            Defensa: 'Defensa',
-            Armada: 'Armada'
-        };
-        const P = { b: '#0055FF', r: '#dc2626', o: '#FF5500', g: '#10b981' };
+        const O = { Servicio: 'Servicio', Ataque: 'Ataque', Bloqueo: 'Bloqueo', Recepción: 'Recepción', Defensa: 'Defensa', Armada: 'Armada' };
+        const P = { b: '#0055FF', o: '#FF5500' };
         const K = { scales: { y: { ticks: { stepSize: 1 } } }, responsive: true, maintainAspectRatio: false };
 
         function mostrarToast(mensaje) {
@@ -70,278 +66,124 @@
             }, 2000);
         }
 
-        // Corrección del nombre de la función unificada
-        function poblarNominaSelect() {
-            const select = _('selectNomina');
-            if (!select) return;
-            select.innerHTML = '<option value="">Seleccione de Nómina...</option>';
-            L_Nomina.forEach(p => {
-                let o = document.createElement('option');
-                o.value = p.cedulaIdentidad || p.id;
-                o.textContent = `#${p.nroCamiseta || '0'} ${p.nombre} ${p.apellido || ''}`;
-                select.appendChild(o);
-            });
-        }
-
-        function renderRosterCards() {
-            const container = _('rosterCardsGrid');
-            const countRoster = _('countRoster');
-            if (countRoster) countRoster.textContent = Roster.length;
-
-            if (!container) return;
-
-            if (!Roster.length) {
-                container.innerHTML = '<div class="col-span-full text-center py-4 text-xs text-slate-400 italic">No hay atletas en el roster del partido.</div>';
-                const badge = _('atletaSeleccionadoBadge');
-                if (badge) badge.classList.add('hidden');
-                atletaSeleccionadoKey = null;
-                return;
-            }
-
-            container.innerHTML = '';
-            Roster.forEach(p => {
-                const card = document.createElement('div');
-                const isSelected = (atletaSeleccionadoKey === p.key);
-                
-                card.className = `relative p-3 rounded-2xl cursor-pointer flex flex-col justify-between card-atleta-item shadow-sm ${isSelected ? 'card-atleta-selected' : ''}`;
-                card.onclick = () => seleccionarAtleta(p.key, p.num, p.name);
-
-                card.innerHTML = `
-                    <button type="button" class="absolute top-1 right-2 text-slate-300 hover:text-rose-600 font-bold text-xs z-10" onclick="event.stopPropagation(); window.quitarDeRoster('${p.key}')">&times;</button>
-                    <div class="text-center py-1">
-                        <span class="inline-block px-2.5 py-0.5 rounded-lg bg-blue-50 text-brand-electric font-black text-sm mb-1 border border-blue-100">#${p.num}</span>
-                        <div class="font-extrabold text-slate-900 text-xs truncate max-w-full">${p.name}</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function seleccionarAtleta(key, num, name) {
-            atletaSeleccionadoKey = key;
-            const badge = _('atletaSeleccionadoBadge');
-            const nombreSel = _('nombreAtletaSel');
-            if (badge) badge.classList.remove('hidden');
-            if (nombreSel) nombreSel.textContent = `#${num} ${name}`;
-            renderRosterCards();
-        }
-
-        window.quitarDeRoster = (key) => {
-            Roster = Roster.filter(x => x.key !== key);
-            if (atletaSeleccionadoKey === key) {
-                atletaSeleccionadoKey = null;
-                const badge = _('atletaSeleccionadoBadge');
-                if (badge) badge.classList.add('hidden');
-            }
-            guardarEstado();
-            renderRosterCards();
-            U();
-        };
-
-        window.registrarAccionDirecta = (accion) => {
-            if (!atletaSeleccionadoKey) {
-                alert("Por favor selecciona un atleta del roster primero (Paso 1).");
-                return;
-            }
-
-            let l = { playerKey: atletaSeleccionadoKey, action: accion };
-            M.push(l);
-            S.push(l);
-            guardarEstado();
-            U();
-            mostrarToast(`Registrado: ${accion}`);
-        };
-
         function guardarEstado() {
             localStorage.setItem('vRoster_' + empresaID, JSON.stringify(Roster));
             localStorage.setItem('vS_' + empresaID, JSON.stringify(S));
+            localStorage.setItem('vHistSets_' + empresaID, JSON.stringify(HistorialSets));
             localStorage.setItem('vM_' + empresaID, JSON.stringify(M));
         }
 
-        function U() {
-            const s = _('st');
-            if (!s) return;
-            s.innerHTML = '';
-
-            let d = {};
-            Roster.forEach(p => {
-                d[p.key] = { key: p.key, p: 0, n: 0, total: 0, efectividad: 0, a: {}, name: p.name, num: p.num };
-            });
-
-            S.forEach(l => {
-                let k = d[l.playerKey];
-                if (k) {
-                    let v = N[l.action];
-                    let t = l.action.replace(/[#=\+\-]/g, '');
-                    
-                    if (v > 0) k.p++; else k.n++;
-                    k.total++;
-                    
-                    if (!k.a[t]) k.a[t] = { p: 0, n: 0 };
-                    if (v > 0) k.a[t].p++; else k.a[t].n++;
-                }
-            });
-
-            Object.values(d).forEach(k => {
-                k.efectividad = k.total > 0 ? Math.round((k.p / k.total) * 100) : 0;
-            });
-
-            const listaOrdenada = Object.values(d).sort((a, b) => {
-                if (b.efectividad !== a.efectividad) return b.efectividad - a.efectividad;
-                return (b.p - b.n) - (a.p - a.n);
-            });
-
-            if (!Roster.length) {
-                s.innerHTML = '<p class="text-center text-slate-400 text-xs py-3">Agrega atletas al Roster para iniciar el registro.</p>';
-            } else {
-                listaOrdenada.forEach(k => {
-                    let dt = '';
-                    Object.keys(k.a).forEach(x => dt += `<span class="mr-2 font-mono">${x}: <span class="text-brand-electric font-bold">${k.a[x].p}</span>|<span class="text-brand-orange font-bold">${k.a[x].n}</span></span>`);
-                    s.innerHTML += `
-                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs flex flex-col gap-1 shadow-sm">
-                            <div class="flex justify-between items-center font-black text-slate-800">
-                                <span>#${k.num} ${k.name}</span>
-                                <div class="flex items-center gap-1.5">
-                                    <span class="px-2 py-0.5 rounded-lg ${k.p - k.n >= 0 ? 'bg-blue-50 text-brand-electric' : 'bg-orange-50 text-brand-orange'}">Dif: ${k.p - k.n}</span>
-                                    <span class="px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-black border border-emerald-200">${k.efectividad}% Ef.</span>
-                                </div>
-                            </div>
-                            <div class="text-[10px] text-slate-500">${dt || '<span class="italic text-slate-400">Sin jugadas registradas en este set</span>'}</div>
-                        </div>`;
-                });
-            }
-
-            const c1El = _('c1');
-            const c2El = _('c2');
-            if (c1El && c2El) {
-                const x1 = c1El.getContext('2d'), x2 = c2El.getContext('2d'), l = Object.values(O);
-                let v1 = { p: [0,0,0,0,0,0,0], n: [0,0,0,0,0,0,0] }, v2 = { p: [0,0,0,0,0,0,0], n: [0,0,0,0,0,0,0] }, tp = 0, tn = 0;
-
-                const keys = Object.keys(O);
-                keys.forEach((k, idx) => {
-                    let p = 0, n = 0, ap = 0, an = 0;
-                    S.forEach(z => { 
-                        let t = z.action.replace(/[#=\+\-]/g, '');
-                        if (t === k) N[z.action] > 0 ? p++ : n++; 
-                    });
-                    M.forEach(z => { 
-                        let t = z.action.replace(/[#=\+\-]/g, '');
-                        if (t === k) {
-                            if (N[z.action] > 0) { ap++; tp++; } else { an++; tn++; }
-                        }
-                    });
-                    v1.p[idx] = p; v1.n[idx] = n;
-                    v2.p[idx] = ap; v2.n[idx] = an;
-                });
-
-                if (b) b.destroy();
-                b = new Chart(x1, { type: 'bar', data: { labels: l, datasets: [{ label: 'Positivo (+)', data: v1.p, backgroundColor: P.b }, { label: 'Negativo (-)', data: v1.n, backgroundColor: P.o }] }, options: { ...K, plugins: { title: { display: true, text: 'SET ACTUAL' } } } });
-                
-                const locInput = _('equipoLocal');
-                const rivInput = _('equipoRival');
-                const loc = locInput ? locInput.value || 'Local' : 'Local';
-                const riv = rivInput ? rivInput.value || 'Rival' : 'Rival';
-                
-                const sumEl = _('sum');
-                if (sumEl) sumEl.innerHTML = `${loc} vs ${riv} — Positivos: <span class="text-brand-electric font-bold">${tp}</span> | Negativos: <span class="text-brand-orange font-bold">${tn}</span>`;
-                
-                if (a) a.destroy();
-                a = new Chart(x2, { type: 'bar', data: { labels: l, datasets: [{ label: 'Positivo (+)', data: v2.p, backgroundColor: P.b }, { label: 'Negativo (-)', data: v2.n, backgroundColor: P.o }] }, options: { ...K, plugins: { title: { display: true, text: 'TOTAL PARTIDO' } } } });
-            }
-
-            renderCuadroHonor();
-        }
-
-        function renderCuadroHonor() {
-            const grid = _('cuadroHonorGrid');
+        function renderHistorial() {
+            const grid = _('historialGrid');
             if (!grid) return;
-            let dPartido = {};
-
-            Roster.forEach(p => {
-                dPartido[p.key] = { p: 0, n: 0, total: 0, efectividad: 0, name: p.name, num: p.num };
-            });
-
-            M.forEach(l => {
-                let k = dPartido[l.playerKey];
-                if (k) {
-                    let v = N[l.action];
-                    if (v > 0) k.p++; else k.n++;
-                    k.total++;
-                }
-            });
-
-            Object.values(dPartido).forEach(k => {
-                k.efectividad = k.total > 0 ? Math.round((k.p / k.total) * 100) : 0;
-            });
-
-            const topCuadro = Object.values(dPartido)
-                .filter(x => x.total > 0)
-                .sort((a, b) => {
-                    if (b.efectividad !== a.efectividad) return b.efectividad - a.efectividad;
-                    return (b.p - b.n) - (a.p - a.n);
-                })
-                .slice(0, 4);
-
-            if (!topCuadro.length) {
-                grid.innerHTML = '<p class="col-span-full text-center text-slate-400 text-xs py-4 italic">Se requieren acciones registradas en el partido para determinar los reconocimientos.</p>';
+            let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
+            
+            if (!historial.length) {
+                grid.innerHTML = '<p class="text-center text-slate-400 text-xs py-2 italic">No hay partidos guardados en el historial.</p>';
                 return;
             }
 
             grid.innerHTML = '';
-            topCuadro.forEach((k, idx) => {
-                let badgeStyle = "bg-slate-100 text-slate-700 border-slate-200";
-                let badgeText = `Top #${idx + 1}`;
-                let iconHtml = '<i class="fas fa-medal text-slate-400"></i>';
-
-                if (idx === 0) {
-                    badgeStyle = "bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-md border-amber-300";
-                    badgeText = "🏆 MVP DEL PARTIDO";
-                    iconHtml = '<i class="fas fa-crown text-amber-300 animate-bounce"></i>';
-                } else if (idx === 1) {
-                    badgeStyle = "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-md border-blue-300";
-                    badgeText = "⭐ ALL-STAR";
-                    iconHtml = '<i class="fas fa-star text-sky-200"></i>';
-                }
-
+            historial.forEach((h, idx) => {
                 grid.innerHTML += `
-                    <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-2 relative overflow-hidden">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-md border ${badgeStyle} flex items-center gap-1.5">
-                                ${iconHtml} ${badgeText}
-                            </span>
-                            <span class="text-xs font-black text-emerald-600 font-mono">${k.efectividad}% Ef.</span>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs flex justify-between items-center gap-2">
+                        <div class="cursor-pointer flex-1" onclick="window.cargarPartidoHistorial(${h.id})">
+                            <span class="font-black text-slate-900 hover:text-brand-electric transition">${h.enfrentamiento}</span>
+                            <div class="text-[10px] text-slate-500">Fecha: ${h.fecha} — Sets jugados: ${h.sets?.length || 0} (Acciones: ${h.accionesTotales || 0})</div>
                         </div>
-                        <div>
-                            <div class="text-xs font-black text-slate-900 truncate">#${k.num} ${k.name}</div>
-                            <div class="text-[10px] text-slate-500 font-semibold mt-0.5">
-                                Puntos (+): <span class="text-brand-electric font-bold">${k.p}</span> | Errores (-): <span class="text-brand-orange font-bold">${k.n}</span>
-                            </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button onclick="window.cargarPartidoHistorial(${h.id})" class="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-electric font-bold rounded-lg border border-brand-electric/20 cursor-pointer" title="Cargar / Ver Partido">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="window.eliminarPartidoHistorial(${h.id})" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-lg border border-rose-200 cursor-pointer" title="Eliminar del Historial">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </div>
                     </div>
                 `;
             });
         }
 
-        // Event Listeners
-        const btnAgNom = _('btnAgregarNomina');
-        if (btnAgNom) {
-            btnAgNom.onclick = () => {
-                const idKey = _('selectNomina').value;
-                if (!idKey) return;
-                const atleta = L_Nomina.find(x => (x.cedulaIdentidad || x.id) == idKey);
-                if (atleta && !Roster.some(x => x.key == idKey)) {
-                    Roster.push({
-                        key: idKey,
-                        num: atleta.nroCamiseta || '0',
-                        name: `${atleta.nombre} ${atleta.apellido || ''}`.trim()
-                    });
+        window.cargarPartidoHistorial = (idPartido) => {
+            let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
+            const partido = historial.find(x => x.id === idPartido);
+            if (!partido) return;
+
+            if (confirm(`¿Deseas cargar el partido "${partido.enfrentamiento}" del ${partido.fecha} para visualizar sus estadísticas actuales?`)) {
+                HistorialSets = partido.sets ? [...partido.sets] : [];
+                M = partido.datos ? [...partido.datos] : [];
+                S = []; 
+                
+                guardarEstado();
+                actualizarInterfazGeneral();
+                mostrarToast('Partido cargado desde el historial');
+            }
+        };
+
+        window.eliminarPartidoHistorial = (idPartido) => {
+            if (confirm('¿Estás seguro de eliminar este partido del historial del club?')) {
+                let historial = JSON.parse(localStorage.getItem('vHistorial_' + empresaID) || '[]');
+                historial = historial.filter(x => x.id !== idPartido);
+                localStorage.setItem('vHistorial_' + empresaID, JSON.stringify(historial));
+                
+                renderHistorial();
+                mostrarToast('Partido eliminado del historial');
+            }
+        };
+
+        function actualizarInterfazGeneral() {
+            if (window.CVModuleRoster) {
+                window.CVModuleRoster.renderRosterCards(Roster, atletaSeleccionadoKey, (k, num, name) => {
+                    atletaSeleccionadoKey = k;
+                    const badge = _('atletaSeleccionadoBadge');
+                    const nombreSel = _('nombreAtletaSel');
+                    if (badge) badge.classList.remove('hidden');
+                    if (nombreSel) nombreSel.textContent = `#${num} ${name}`;
+                    actualizarInterfazGeneral();
+                }, (k) => {
+                    Roster = Roster.filter(x => x.key !== k);
+                    if (atletaSeleccionadoKey === k) {
+                        atletaSeleccionadoKey = null;
+                        const badge = _('atletaSeleccionadoBadge');
+                        if (badge) badge.classList.add('hidden');
+                    }
                     guardarEstado();
-                    renderRosterCards();
-                    U();
-                    mostrarToast('Atleta añadido al Roster');
-                }
-            };
+                    actualizarInterfazGeneral();
+                });
+            }
+
+            if (window.CVModuleResultados) {
+                window.CVModuleResultados.renderResumenTabs(HistorialSets, setResumenSeleccionado, (nuevoSet) => {
+                    setResumenSeleccionado = nuevoSet;
+                    actualizarInterfazGeneral();
+                });
+                window.CVModuleResultados.renderResumenAtletas(Roster, S, HistorialSets, setResumenSeleccionado, N);
+                window.CVModuleResultados.renderTablaMatricial(Roster, S, HistorialSets, N);
+            }
+
+            if (window.CVModuleGraficas) {
+                window.CVModuleGraficas.renderGraficaTabs(HistorialSets, setGraficaSeleccionado, (nuevoSet) => {
+                    setGraficaSeleccionado = nuevoSet;
+                    actualizarInterfazGeneral();
+                });
+                let resGraficas = window.CVModuleGraficas.actualizarGraficas(S, HistorialSets, M, setGraficaSeleccionado, O, N, P, K, b, a);
+                b = resGraficas.b;
+                a = resGraficas.a;
+            }
+
+            if (window.CVModuleHonor) {
+                window.CVModuleHonor.renderCuadroHonor(Roster, M, N);
+            }
         }
+
+        window.registrarAccionDirecta = (accion) => {
+            if (window.CVModuleAcciones) {
+                window.CVModuleAcciones.registrarAccion(atletaSeleccionadoKey, accion, N, M, S, () => {
+                    guardarEstado();
+                    actualizarInterfazGeneral();
+                }, mostrarToast);
+            }
+        };
 
         const btnAgMan = _('btnAgregarManual');
         if (btnAgMan) {
@@ -357,26 +199,19 @@
                 _('manualNom').value = '';
 
                 guardarEstado();
-                renderRosterCards();
-                U();
-                mostrarToast('Atleta invitado añadido');
+                actualizarInterfazGeneral();
+                mostrarToast('Atleta añadido al Roster');
             };
         }
 
         const btnDeshacer = _('btnDeshacer');
         if (btnDeshacer) {
             btnDeshacer.onclick = () => {
-                if (!S.length && !M.length) {
-                    alert("No hay jugadas registradas para deshacer.");
-                    return;
-                }
-
-                if (confirm("¿Deseas eliminar la última jugada registrada por error?")) {
-                    S.pop();
-                    M.pop();
-                    guardarEstado();
-                    U();
-                    mostrarToast("Última jugada eliminada");
+                if (window.CVModuleAcciones) {
+                    window.CVModuleAcciones.deshacerAccion(S, M, () => {
+                        guardarEstado();
+                        actualizarInterfazGeneral();
+                    }, mostrarToast);
                 }
             };
         }
@@ -384,24 +219,28 @@
         const rsBtn = _('rs');
         if (rsBtn) {
             rsBtn.onclick = () => {
-                if (confirm('¿Desea culminar el set actual y reiniciar la estadística para el siguiente set?')) {
-                    S = [];
-                    guardarEstado();
-                    U();
-                    mostrarToast('Set culminado');
+                if (window.CVModuleAcciones) {
+                    window.CVModuleAcciones.culminarSet(HistorialSets, S, () => {
+                        setResumenSeleccionado = 'ACTUAL';
+                        setGraficaSeleccionado = 'ACTUAL';
+                        guardarEstado();
+                        actualizarInterfazGeneral();
+                    }, mostrarToast);
                 }
             };
         }
 
         const btnCulPart = _('btnCulminarPartido');
         if (btnCulPart) {
-            btnCulPart.onclick = () => {
-                if (confirm('¿Desea culminar el partido? Esto reseteará todas las acciones y sets a cero, conservando los atletas en el roster.')) {
-                    S = [];
-                    M = [];
-                    guardarEstado();
-                    U();
-                    mostrarToast('Partido culminado — Roster conservado');
+            btnCulPart.onclick = async () => {
+                if (window.CVModuleAcciones) {
+                    await window.CVModuleAcciones.culminarPartido(supabase, empresaID, clubNombre, S, HistorialSets, M, () => {
+                        setResumenSeleccionado = 'ACTUAL';
+                        setGraficaSeleccionado = 'ACTUAL';
+                        guardarEstado();
+                        renderHistorial();
+                        actualizarInterfazGeneral();
+                    }, mostrarToast);
                 }
             };
         }
@@ -409,34 +248,198 @@
         const raBtn = _('ra');
         if (raBtn) {
             raBtn.onclick = () => {
-                if (confirm('¿Seguro que deseas ELIMINAR EL JUEGO? Se blanqueará el Roster, se borrarán las estadísticas y se reiniciarán los datos.')) {
+                if (confirm('¿Seguro que deseas ELIMINAR EL JUEGO Y REINICIAR?')) {
                     localStorage.removeItem('vRoster_' + empresaID);
                     localStorage.removeItem('vS_' + empresaID);
+                    localStorage.removeItem('vHistSets_' + empresaID);
                     localStorage.removeItem('vM_' + empresaID);
-                    localStorage.removeItem('vLocal_' + empresaID);
-                    localStorage.removeItem('vRival_' + empresaID);
-                    Roster = []; S = []; M = []; atletaSeleccionadoKey = null;
-                    const locInput = _('equipoLocal');
-                    const rivInput = _('equipoRival');
-                    if (locInput) locInput.value = clubNombre;
-                    if (rivInput) rivInput.value = 'Rival';
+                    Roster = []; S = []; HistorialSets = []; M = []; atletaSeleccionadoKey = null;
+                    setResumenSeleccionado = 'ACTUAL';
+                    setGraficaSeleccionado = 'ACTUAL';
                     const badge = _('atletaSeleccionadoBadge');
                     if (badge) badge.classList.add('hidden');
-                    renderRosterCards();
-                    U();
-                    mostrarToast('Juego eliminado y reiniciado');
+                    actualizarInterfazGeneral();
+                    mostrarToast('Juego reiniciado');
                 }
             };
         }
 
+        // BOTÓN EXPORTAR / REPORTE PDF CON DISEÑO ESTÁTICO Y CENTRADO PERFECTO
         const btnExpPdf = _('btnExportarPdf');
         if (btnExpPdf) {
-            btnExpPdf.onclick = () => {
-                window.print();
+            const generarPdfMovil = async (e) => {
+                e.preventDefault();
+                mostrarToast('Generando PDF...');
+
+                const local = _('equipoLocal')?.value || 'Local';
+                const rival = _('equipoRival')?.value || 'Rival';
+                const nombreArchivo = `Reporte_${local}_vs_${rival}.pdf`.replace(/\s+/g, '_');
+
+                // Configuramos los márgenes simétricos exactos en el motor PDF
+                const opciones = {
+                    margin:       [8, 8, 8, 8], // [superior, derecho, inferior, izquierdo] en mm
+                    filename:     nombreArchivo,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 800 },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                // Contenedor principal con ancho fijo controlado para evitar desbordes
+                const elementoReporte = document.createElement('div');
+                elementoReporte.style.width = '700px'; // Ancho base fijo ideal para A4
+                elementoReporte.style.margin = '0 auto';
+                elementoReporte.style.padding = '10px';
+                elementoReporte.style.background = '#ffffff';
+                elementoReporte.style.color = '#000000';
+                elementoReporte.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
+                elementoReporte.style.boxSizing = 'border-box';
+
+                // Cabecera limpia y centrada
+                elementoReporte.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0055FF; padding-bottom: 10px; width: 100%;">
+                        <h2 style="font-size: 16px; font-weight: 900; color: #030B1E; margin: 0;">CONTROL VOLEY PRO - REPORTE OFICIAL</h2>
+                        <p style="font-size: 13px; font-weight: 700; color: #0055FF; margin: 5px 0 0 0;">${local} vs ${rival}</p>
+                    </div>
+                `;
+
+                const tarjetas = Array.from(document.querySelectorAll('.glass-card'));
+                const tarjetasValidas = tarjetas.filter(card => 
+                    !card.id.includes('bloqueRoster') && 
+                    !card.id.includes('bloqueAcciones') && 
+                    !card.id.includes('bloqueHistorial')
+                );
+
+                let cuadroHonorCard = null;
+                const tarjetasOrdenadas = [];
+
+                tarjetasValidas.forEach(card => {
+                    if (card.querySelector('.fa-award') || card.innerHTML.includes('Cuadro de Honor')) {
+                        cuadroHonorCard = card;
+                    } else {
+                        tarjetasOrdenadas.push(card);
+                    }
+                });
+
+                if (cuadroHonorCard) {
+                    const indexGraficas = tarjetasOrdenadas.findIndex(card => card.querySelector('canvas'));
+                    if (indexGraficas !== -1) {
+                        tarjetasOrdenadas.splice(indexGraficas, 0, cuadroHonorCard);
+                    } else {
+                        tarjetasOrdenadas.push(cuadroHonorCard);
+                    }
+                }
+
+                tarjetasOrdenadas.forEach((card) => {
+                    const clon = card.cloneNode(true);
+                    clon.querySelectorAll('button, .no-print').forEach(el => el.remove());
+                    
+                    // Forzamos estilos simétricos absolutos para el PDF
+                    clon.className = ''; 
+                    clon.style.width = '100%';
+                    clon.style.maxWidth = '100%';
+                    clon.style.margin = '0 0 15px 0';
+                    clon.style.padding = '12px';
+                    clon.style.boxSizing = 'border-box';
+                    clon.style.background = '#ffffff';
+                    clon.style.border = '1px solid #cbd5e1';
+                    clon.style.borderRadius = '8px';
+                    clon.style.pageBreakInside = 'avoid';
+                    clon.style.boxShadow = 'none';
+
+                    // Limpieza total de restricciones de altura y scroll en los clones
+                    clon.style.maxHeight = 'none';
+                    clon.style.overflow = 'visible';
+                    clon.style.height = 'auto';
+
+                    clon.querySelectorAll('[class*="max-h-"], [class*="overflow-y-auto"], [class*="grid"]').forEach(el => {
+                        el.style.maxHeight = 'none';
+                        el.style.overflow = 'visible';
+                        el.style.height = 'auto';
+                        el.style.width = '100%';
+                    });
+
+                    // Si la tarjeta contiene los inputs de equipos o elementos de cabecera, los estilizamos planos
+                    clon.querySelectorAll('input').forEach(input => {
+                        const val = input.value || '';
+                        const span = document.createElement('span');
+                        span.style.fontWeight = 'bold';
+                        span.style.fontSize = '12px';
+                        span.textContent = val;
+                        input.replaceWith(span);
+                    });
+
+                    if (card.querySelector('canvas')) {
+                        clon.style.pageBreakBefore = 'always';
+                    }
+
+                    // Conversión nítida de gráficas (canvas a imagen centrada)
+                    const canvasOriginales = card.querySelectorAll('canvas');
+                    const canvasClonados = clon.querySelectorAll('canvas');
+                    
+                    canvasOriginales.forEach((canvasOrig, index) => {
+                        if (canvasClonados[index]) {
+                            try {
+                                const urlImagen = canvasOrig.toDataURL('image/png');
+                                const img = document.createElement('img');
+                                img.src = urlImagen;
+                                img.style.display = 'block';
+                                img.style.margin = '0 auto';
+                                img.style.maxWidth = '90%';
+                                img.style.height = 'auto';
+                                canvasClonados[index].replaceWith(img);
+                            } catch (err) {
+                                console.error("No se pudo convertir el canvas:", err);
+                            }
+                        }
+                    });
+
+                    elementoReporte.appendChild(clon);
+                });
+
+                html2pdf().from(elementoReporte).set(opciones).save().then(() => {
+                    mostrarToast('¡PDF guardado con éxito!');
+                }).catch(err => {
+                    console.error("Error al generar PDF:", err);
+                    window.print();
+                });
             };
+
+            btnExpPdf.addEventListener('click', generarPdfMovil);
+            btnExpPdf.addEventListener('touchend', generarPdfMovil);
         }
 
-        // Inicialización
+        // NUEVO BOTÓN: FORZAR ACTUALIZACIÓN Y BORRAR CACHÉ MÓVIL
+        const btnActualizarApp = _('btnForzarActualizacion');
+        if (btnActualizarApp) {
+            const forzarReload = async (e) => {
+                e.preventDefault();
+                if (confirm('¿Deseas buscar e instalar la versión más reciente del sistema?')) {
+                    try {
+                        if ('serviceWorker' in navigator) {
+                            const registrations = await navigator.serviceWorker.getRegistrations();
+                            for (let registration of registrations) {
+                                await registration.unregister();
+                            }
+                        }
+                        if ('caches' in window) {
+                            const cacheNames = await caches.keys();
+                            for (let name of cacheNames) {
+                                await caches.delete(name);
+                            }
+                        }
+                        mostrarToast('Actualizando sistema...');
+                        setTimeout(() => {
+                            window.location.reload(true);
+                        }, 800);
+                    } catch (err) {
+                        window.location.reload(true);
+                    }
+                }
+            };
+            btnActualizarApp.addEventListener('click', forzarReload);
+            btnActualizarApp.addEventListener('touchend', forzarReload);
+        }
+
         async function init() {
             const hoy = new Date();
             const fechaDisplay = _('fechaJuegoDisplay');
@@ -452,20 +455,8 @@
             if (locInput) locInput.oninput = e => localStorage.setItem('vLocal_' + empresaID, e.target.value);
             if (rivInput) rivInput.oninput = e => localStorage.setItem('vRival_' + empresaID, e.target.value);
 
-            try {
-                const { data: atletas } = await supabase.from('atletas').select('*').order('nroCamiseta', { ascending: true });
-                L_Nomina = atletas || [];
-                poblarNominaSelect(); // <-- Llamada corregida correctamente
-            } catch (err) {
-                console.error("Error al cargar atletas:", err);
-            }
-
-            Roster = JSON.parse(localStorage.getItem('vRoster_' + empresaID) || '[]');
-            S = JSON.parse(localStorage.getItem('vS_' + empresaID) || '[]');
-            M = JSON.parse(localStorage.getItem('vM_' + empresaID) || '[]');
-
-            renderRosterCards();
-            U();
+            actualizarInterfazGeneral();
+            renderHistorial();
         }
 
         init();
