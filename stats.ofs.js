@@ -283,9 +283,21 @@
             };
         }
 
+        // BOTÓN EXPORTAR / REPORTE PDF ROBUSTO PARA MÓVILES Y PC
         const btnExpPdf = _('btnExportarPdf');
         if (btnExpPdf) {
-            btnExpPdf.onclick = () => window.print();
+            const dispararImpresion = (e) => {
+                e.preventDefault();
+                try {
+                    window.focus();
+                    window.print();
+                } catch (err) {
+                    console.error("Error al exportar PDF:", err);
+                    alert("No se pudo iniciar la impresión automática en este dispositivo móvil.");
+                }
+            };
+            btnExpPdf.addEventListener('click', dispararImpresion);
+            btnExpPdf.addEventListener('touchend', dispararImpresion);
         }
 
         async function init() {
