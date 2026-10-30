@@ -264,7 +264,7 @@
             };
         }
 
-        // BOTÓN EXPORTAR / REPORTE PDF CON EXPANSIÓN COMPLETA DE ATLETAS
+        // BOTÓN EXPORTAR / REPORTE PDF CON MARGEN IZQUIERDO CORREGIDO
         const btnExpPdf = _('btnExportarPdf');
         if (btnExpPdf) {
             const generarPdfMovil = async (e) => {
@@ -275,22 +275,25 @@
                 const rival = _('equipoRival')?.value || 'Rival';
                 const nombreArchivo = `Reporte_${local}_vs_${rival}.pdf`.replace(/\s+/g, '_');
 
+                // 💡 Reducimos y ajustamos los márgenes milimétricos del documento (arriba/abajo, izquierdo/derecho)
                 const opciones = {
-                    margin:       5,
+                    margin:       [10, 6, 10, 6], // [superior, derecho, inferior, izquierdo] en mm
                     filename:     nombreArchivo,
                     image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+                    html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 800 },
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
 
                 const elementoReporte = document.createElement('div');
-                elementoReporte.style.padding = '15px';
+                elementoReporte.style.width = '100%';
+                elementoReporte.style.boxSizing = 'border-box';
+                elementoReporte.style.padding = '0px 5px'; // Padding interno mínimo para aprovechar todo el ancho
                 elementoReporte.style.background = '#ffffff';
                 elementoReporte.style.color = '#000000';
                 elementoReporte.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
 
                 elementoReporte.innerHTML = `
-                    <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #0055FF; padding-bottom: 10px;">
+                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0055FF; padding-bottom: 10px; width: 100%;">
                         <h2 style="font-size: 18px; font-weight: 900; color: #030B1E; margin: 0;">CONTROL VOLEY PRO - REPORTE OFICIAL</h2>
                         <p style="font-size: 14px; font-weight: 700; color: #0055FF; margin: 5px 0 0 0;">${local} vs ${rival}</p>
                     </div>
@@ -327,14 +330,15 @@
                     const clon = card.cloneNode(true);
                     clon.querySelectorAll('button, .no-print').forEach(el => el.remove());
                     clon.style.marginBottom = '20px';
+                    clon.style.width = '100%';
+                    clon.style.boxSizing = 'border-box';
                     clon.style.pageBreakInside = 'avoid';
 
-                    // 💡 SOLUCIÓN CLAVE: Forzamos altura automática y removemos límites de scroll (max-height)
+                    // Forzamos altura automática y removemos límites de scroll (max-height)
                     clon.style.maxHeight = 'none';
                     clon.style.overflow = 'visible';
                     clon.style.height = 'auto';
 
-                    // Buscamos también dentro del clon cualquier contenedor con scroll interno (como la lista de atletas o tablas)
                     clon.querySelectorAll('[class*="max-h-"], [class*="overflow-y-auto"]').forEach(scrollEl => {
                         scrollEl.style.maxHeight = 'none';
                         scrollEl.style.overflow = 'visible';
