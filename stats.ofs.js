@@ -264,7 +264,7 @@
             };
         }
 
-        // BOTÓN EXPORTAR / REPORTE PDF CON ESPACIADO CORREGIDO
+        // BOTÓN EXPORTAR / REPORTE PDF CON ORDEN DE PÁGINAS (HONOR ARRIBA, GRÁFICAS ABAJO)
         const btnExpPdf = _('btnExportarPdf');
         if (btnExpPdf) {
             const generarPdfMovil = async (e) => {
@@ -296,38 +296,73 @@
                     </div>
                 `;
 
-                // Recorremos las tarjetas glass-card visibles
-                const tarjetas = document.querySelectorAll('.glass-card');
-                tarjetas.forEach((card) => {
-                    if (!card.id.includes('bloqueRoster') && !card.id.includes('bloqueAcciones') && !card.id.includes('bloqueHistorial')) {
-                        const clon = card.cloneNode(true);
-                        clon.querySelectorAll('button, .no-print').forEach(el => el.remove());
+                // 1. Buscamos todas las tarjetas de la interfaz original
+                const tarjetas = Array.from(document.querySelectorAll('.glass-card'));
 
-                        // Damos aire adicional a las tarjetas, especialmente a la de gráficas
-                        clon.style.marginBottom = '25px';
-                        clon.style.pageBreakInside = 'avoid';
+                // 2. Filtramos las que no deben salir en el PDF
+                const tarjetasValidas = tarjetas.filter(card => 
+                    !card.id.includes('bloqueRoster') && 
+                    !card.id.includes('bloqueAcciones') && 
+                    !card.id.includes('bloqueHistorial')
+                );
 
-                        // Convertimos los canvas originales en imágenes estéticas para el clon
-                        const canvasOriginales = card.querySelectorAll('canvas');
-                        const canvasClonados = clon.querySelectorAll('canvas');
-                        
-                        canvasOriginales.forEach((canvasOrig, index) => {
-                            if (canvasClonados[index]) {
-                                try {
-                                    const urlImagen = canvasOrig.toDataURL('image/png');
-                                    const img = document.createElement('img');
-                                    img.src = urlImagen;
-                                    img.style.maxWidth = '100%';
-                                    img.style.height = 'auto';
-                                    canvasClonados[index].replaceWith(img);
-                                } catch (err) {
-                                    console.error("No se pudo convertir el canvas:", err);
-                                }
-                            }
-                        });
+                // 3. Reordenamos inteligentemente: 
+                // Buscamos la tarjeta del Cuadro de Honor para moverla antes de las gráficas
+                let cuadroHonorCard = null;
+                const tarjetasOrdenadas = [];
 
-                        elementoReporte.appendChild(clon);
+                tarjetasValidas.forEach(card => {
+                    // Verificamos si es el Cuadro de Honor (por su contenido o estructura)
+                    if (card.querySelector('.fa-award') || card.innerHTML.includes('Cuadro de Honor')) {
+                        cuadroHonorCard = card;
+                    } else {
+                        tarjetasOrdenadas.push(card);
                     }
+                });
+
+                // Si encontramos el Cuadro de Honor, lo insertamos justo antes de las gráficas (o al final de la 1era sección)
+                // Colocándolo antes de la tarjeta de gráficas (que contiene canvas)
+                if (cuadroHonorCard) {
+                    const indexGraficas = tarjetasOrdenadas.findIndex(card => card.querySelector('canvas'));
+                    if (indexGraficas !== -1) {
+                        tarjetasOrdenadas.splice(indexGraficas, 0, cuadroHonorCard);
+                    } else {
+                        tarjetasOrdenadas.push(cuadroHonorCard);
+                    }
+                }
+
+                // 4. Procesamos y añadimos cada tarjeta al contenedor del PDF
+                tarjetasOrdenadas.forEach((card) => {
+                    const clon = card.cloneNode(true);
+                    clon.querySelectorAll('button, .no-print').forEach(el => el.remove());
+                    clon.style.marginBottom = '20px';
+                    clon.style.pageBreakInside = 'avoid';
+
+                    // Si esta tarjeta es la de las gráficas (contiene canvas), le forzamos un salto de página previo
+                    if (card.querySelector('canvas')) {
+                        clon.style.pageBreakBefore = 'always';
+                    }
+
+                    // Convertimos los canvas originales en imágenes estéticas para el clon del PDF
+                    const canvasOriginales = card.querySelectorAll('canvas');
+                    const canvasClonados = clon.querySelectorAll('canvas');
+                    
+                    canvasOriginales.forEach((canvasOrig, index) => {
+                        if (canvasClonados[index]) {
+                            try {
+                                const urlImagen = canvasOrig.toDataURL('image/png');
+                                const img = document.createElement('img');
+                                img.src = urlImagen;
+                                img.style.maxWidth = '100%';
+                                img.style.height = 'auto';
+                                canvasClonados[index].replaceWith(img);
+                            } catch (err) {
+                                console.error("No se pudo convertir el canvas:", err);
+                            }
+                        }
+                    });
+
+                    elementoReporte.appendChild(clon);
                 });
 
                 // Generamos y descargamos el PDF real
