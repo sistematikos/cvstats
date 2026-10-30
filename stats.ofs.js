@@ -264,7 +264,7 @@
             };
         }
 
-        // BOTÓN EXPORTAR / REPORTE PDF CON ORDEN DE PÁGINAS (HONOR ARRIBA, GRÁFICAS ABAJO)
+        // BOTÓN EXPORTAR / REPORTE PDF CON EXPANSIÓN COMPLETA DE ATLETAS
         const btnExpPdf = _('btnExportarPdf');
         if (btnExpPdf) {
             const generarPdfMovil = async (e) => {
@@ -296,23 +296,17 @@
                     </div>
                 `;
 
-                // 1. Buscamos todas las tarjetas de la interfaz original
                 const tarjetas = Array.from(document.querySelectorAll('.glass-card'));
-
-                // 2. Filtramos las que no deben salir en el PDF
                 const tarjetasValidas = tarjetas.filter(card => 
                     !card.id.includes('bloqueRoster') && 
                     !card.id.includes('bloqueAcciones') && 
                     !card.id.includes('bloqueHistorial')
                 );
 
-                // 3. Reordenamos inteligentemente: 
-                // Buscamos la tarjeta del Cuadro de Honor para moverla antes de las gráficas
                 let cuadroHonorCard = null;
                 const tarjetasOrdenadas = [];
 
                 tarjetasValidas.forEach(card => {
-                    // Verificamos si es el Cuadro de Honor (por su contenido o estructura)
                     if (card.querySelector('.fa-award') || card.innerHTML.includes('Cuadro de Honor')) {
                         cuadroHonorCard = card;
                     } else {
@@ -320,8 +314,6 @@
                     }
                 });
 
-                // Si encontramos el Cuadro de Honor, lo insertamos justo antes de las gráficas (o al final de la 1era sección)
-                // Colocándolo antes de la tarjeta de gráficas (que contiene canvas)
                 if (cuadroHonorCard) {
                     const indexGraficas = tarjetasOrdenadas.findIndex(card => card.querySelector('canvas'));
                     if (indexGraficas !== -1) {
@@ -331,19 +323,28 @@
                     }
                 }
 
-                // 4. Procesamos y añadimos cada tarjeta al contenedor del PDF
                 tarjetasOrdenadas.forEach((card) => {
                     const clon = card.cloneNode(true);
                     clon.querySelectorAll('button, .no-print').forEach(el => el.remove());
                     clon.style.marginBottom = '20px';
                     clon.style.pageBreakInside = 'avoid';
 
-                    // Si esta tarjeta es la de las gráficas (contiene canvas), le forzamos un salto de página previo
+                    // 💡 SOLUCIÓN CLAVE: Forzamos altura automática y removemos límites de scroll (max-height)
+                    clon.style.maxHeight = 'none';
+                    clon.style.overflow = 'visible';
+                    clon.style.height = 'auto';
+
+                    // Buscamos también dentro del clon cualquier contenedor con scroll interno (como la lista de atletas o tablas)
+                    clon.querySelectorAll('[class*="max-h-"], [class*="overflow-y-auto"]').forEach(scrollEl => {
+                        scrollEl.style.maxHeight = 'none';
+                        scrollEl.style.overflow = 'visible';
+                        scrollEl.style.height = 'auto';
+                    });
+
                     if (card.querySelector('canvas')) {
                         clon.style.pageBreakBefore = 'always';
                     }
 
-                    // Convertimos los canvas originales en imágenes estéticas para el clon del PDF
                     const canvasOriginales = card.querySelectorAll('canvas');
                     const canvasClonados = clon.querySelectorAll('canvas');
                     
@@ -365,7 +366,6 @@
                     elementoReporte.appendChild(clon);
                 });
 
-                // Generamos y descargamos el PDF real
                 html2pdf().from(elementoReporte).set(opciones).save().then(() => {
                     mostrarToast('¡PDF guardado con éxito!');
                 }).catch(err => {
