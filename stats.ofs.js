@@ -264,21 +264,67 @@
             };
         }
 
-        // BOTÓN EXPORTAR / REPORTE PDF ROBUSTO PARA MÓVILES Y PC
+        // BOTÓN EXPORTAR / REPORTE PDF REAL PARA MÓVILES Y PC
         const btnExpPdf = _('btnExportarPdf');
         if (btnExpPdf) {
-            const dispararImpresion = (e) => {
+            const generarPdfMovil = (e) => {
                 e.preventDefault();
-                try {
-                    window.focus();
+                mostrarToast('Generando PDF...');
+
+                // Seleccionamos el contenedor principal o los bloques limpios de reporte
+                const local = _('equipoLocal')?.value || 'Local';
+                const rival = _('equipoRival')?.value || 'Rival';
+                const nombreArchivo = `Reporte_${local}_vs_${rival}.pdf`.replace(/\s+/g, '_');
+
+                // Opciones de configuración para que salga estético y ordenado
+                const opciones = {
+                    margin:       5,
+                    filename:     nombreArchivo,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                // Creamos un contenedor temporal clonando solo lo que debe ir en el reporte
+                const elementoReporte = document.createElement('div');
+                elementoReporte.style.padding = '15px';
+                elementoReporte.style.background = '#ffffff';
+                elementoReporte.style.color = '#000000';
+                elementoReporte.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
+
+                // Añadimos título del enfrentamiento
+                elementoReporte.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0055FF; padding-bottom: 10px;">
+                        <h2 style="font-size: 18px; font-weight: 900; color: #030B1E; margin: 0;">CONTROL VOLEY PRO - REPORTE OFICIAL</h2>
+                        <p style="font-size: 14px; font-weight: 700; color: #0055FF; margin: 5px 0 0 0;">${local} vs ${rival}</p>
+                    </div>
+                `;
+
+                // Recogemos los bloques de estadísticas, tabla matricial, gráficas y honor del DOM actual
+                // (Buscamos las tarjetas glass-card que están visibles)
+                const tarjetas = document.querySelectorAll('.glass-card');
+                tarjetas.forEach((card, idx) => {
+                    // Excluimos las que tengan elementos de roster o acciones táctiles para que el PDF salga limpio
+                    if (!card.id.includes('bloqueRoster') && !card.id.includes('bloqueAcciones') && !card.id.includes('bloqueHistorial')) {
+                        const clon = card.cloneNode(true);
+                        // Limpiamos botones o pestañas interactivas que no deban salir impresas
+                        clon.querySelectorAll('button, .no-print').forEach(el => el.remove());
+                        elementoReporte.appendChild(clon);
+                    }
+                });
+
+                // Ejecutamos la generación y descarga del PDF real
+                html2pdf().from(elementoReporte).set(opciones).save().then(() => {
+                    mostrarToast('¡PDF guardado con éxito!');
+                }).catch(err => {
+                    console.error("Error al generar PDF:", err);
+                    // Fallback a impresión nativa si ocurre algún percance
                     window.print();
-                } catch (err) {
-                    console.error("Error al exportar PDF:", err);
-                    alert("No se pudo iniciar la impresión automática en este dispositivo móvil.");
-                }
+                });
             };
-            btnExpPdf.addEventListener('click', dispararImpresion);
-            btnExpPdf.addEventListener('touchend', dispararImpresion);
+
+            btnExpPdf.addEventListener('click', generarPdfMovil);
+            btnExpPdf.addEventListener('touchend', generarPdfMovil);
         }
 
         // NUEVO BOTÓN: FORZAR ACTUALIZACIÓN Y BORRAR CACHÉ MÓVIL
