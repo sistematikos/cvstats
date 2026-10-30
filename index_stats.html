@@ -92,6 +92,10 @@
                 <i class="fas fa-right-from-bracket"></i> Cerrar Sesión
             </button>
             <div class="flex items-center gap-2">
+                <!-- BOTÓN ACTUALIZAR APP -->
+                <button id="btnForzarActualizacion" class="px-3 py-2 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-sky-200 shadow-sm cursor-pointer" title="Actualizar app a la nueva versión">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
                 <button id="btnExportarPdf" class="px-3 py-2 bg-white/80 hover:bg-white text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-slate-200 shadow-sm cursor-pointer">
                     <i class="fas fa-print"></i> Reporte PDF
                 </button>
@@ -114,7 +118,7 @@
                         CV-STATS <span class="text-[10px] bg-brand-electric text-white px-2 py-0.5 rounded-md font-bold ml-1">PRO</span>
                     </h1>
                     <p id="userEmail" class="text-slate-300 text-xs sm:text-sm mt-1 font-medium flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span> Cargando información del club...
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span> Club Autorizado
                     </p>
                 </div>
             </div>
@@ -337,13 +341,13 @@
     </script>
 
     <!-- SCRIPTS MODULARES CON VERSIÓN PARA EVITAR CACHÉ EN MÓVIL -->
-    <script src="stats.rost.ofs.js?v=3.8"></script>
-    <script src="stats.acc.ofs.js?v=3.8"></script>
-    <script src="stats.honor.ofs.js?v=3.8"></script>
-    <script src="stats.graf.ofs.js?v=3.8"></script>
-    <script src="stats.result.ofs.js?v=3.8"></script>
+    <script src="stats.rost.ofs.js?v=3.9"></script>
+    <script src="stats.acc.ofs.js?v=3.9"></script>
+    <script src="stats.honor.ofs.js?v=3.9"></script>
+    <script src="stats.graf.ofs.js?v=3.9"></script>
+    <script src="stats.result.ofs.js?v=3.9"></script>
     
     <!-- SCRIPT PRINCIPAL COORDINADOR -->
-    <script type="module" src="stats.ofs.js?v=3.8"></script>
+    <script type="module" src="stats.ofs.js?v=3.9"></script>
 </body>
 </html>
