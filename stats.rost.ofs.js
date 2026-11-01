@@ -30,7 +30,8 @@ window.CVModuleRoster = (function() {
             const card = document.createElement('div');
             const isSelected = (atletaSeleccionadoKey === p.key);
             
-            card.className = `relative px-3 py-2.5 rounded-2xl cursor-pointer flex items-center gap-2 card-atleta-item shadow-sm select-none touch-manipulation transition ${isSelected ? 'card-atleta-selected ring-2 ring-brand-electric bg-blue-50/80' : 'bg-white'}`;
+            // Estructura de tarjeta en dos líneas
+            card.className = `relative p-2.5 rounded-2xl cursor-pointer flex flex-col items-center gap-1.5 card-atleta-item shadow-sm select-none touch-manipulation transition ${isSelected ? 'card-atleta-selected ring-2 ring-brand-electric bg-blue-50/80' : 'bg-white'}`;
             
             // Selección normal al tocar la tarjeta
             const handleSelect = (e) => {
@@ -40,32 +41,32 @@ window.CVModuleRoster = (function() {
             card.onclick = handleSelect;
             card.ontouchend = handleSelect;
 
-            // Contenido de la tarjeta con botones de desplazamiento rápido (Subir / Bajar / Eliminar)
+            // Contenido organizado en 2 líneas:
+            // 1ª Línea: Número, Flecha de subir y Botón X de eliminar
+            // 2ª Línea: Nombre completo centrado
             card.innerHTML = `
-                <span class="px-2 py-0.5 rounded-lg bg-blue-100 text-brand-electric font-black text-xs shrink-0">#${p.num}</span>
-                <div class="font-extrabold text-slate-900 text-xs truncate w-full">${p.name}</div>
-                
-                <!-- Botón para subir de posición rápidamente hacia arriba -->
-                <button type="button" class="btn-subir w-6 h-6 flex items-center justify-center text-slate-400 hover:text-brand-electric text-xs bg-slate-100 rounded-lg shrink-0" title="Subir de puesto">
-                    <i class="fas fa-arrow-up"></i>
-                </button>
-                
-                <!-- Botón de eliminar -->
-                <button type="button" class="btn-eliminar w-6 h-6 flex items-center justify-center text-slate-300 hover:text-rose-600 text-sm shrink-0" title="Eliminar">&times;</button>
+                <div class="flex items-center justify-between w-full px-1">
+                    <span class="px-2 py-0.5 rounded-lg bg-blue-100 text-brand-electric font-black text-xs shrink-0">#${p.num}</span>
+                    <div class="flex items-center gap-1">
+                        <button type="button" class="btn-subir w-6 h-6 flex items-center justify-center text-slate-400 hover:text-brand-electric text-xs bg-slate-100 rounded-lg shrink-0 cursor-pointer" title="Subir de puesto">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button type="button" class="btn-eliminar w-6 h-6 flex items-center justify-center text-slate-300 hover:text-rose-600 text-sm shrink-0 cursor-pointer" title="Eliminar">&times;</button>
+                    </div>
+                </div>
+                <div class="font-extrabold text-slate-900 text-xs text-center w-full px-1 break-words">${p.name}</div>
             `;
 
-            // Evento para SUBIR al jugador de posición (llevarlo hacia arriba en la lista)
+            // Evento para SUBIR al jugador de posición
             const btnSubir = card.querySelector('.btn-subir');
             btnSubir.onclick = (e) => {
                 e.stopPropagation();
                 e.preventDefault();
                 if (index > 0) {
-                    // Intercambiamos el orden con el jugador de arriba
                     const tempOrden = Roster[index].orden;
                     Roster[index].orden = Roster[index - 1].orden;
                     Roster[index - 1].orden = tempOrden;
                     
-                    // Re-renderizamos para actualizar la vista de inmediato
                     renderRosterCards(Roster, atletaSeleccionadoKey, callbackSeleccionar, callbackQuitar, callbackMoverPosicion);
                 }
             };
