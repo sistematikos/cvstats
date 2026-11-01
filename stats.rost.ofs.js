@@ -42,14 +42,18 @@ window.CVModuleRoster = (function() {
             card.innerHTML = `
                 <span class="px-2 py-0.5 rounded-lg bg-blue-50 text-brand-electric font-black text-xs border border-blue-100 shrink-0">#${p.num}</span>
                 <div class="font-extrabold text-slate-900 text-xs truncate w-full pr-6">${p.name}</div>
-                <button type="button" class="absolute right-2 w-6 h-6 flex items-center justify-center text-slate-300 hover:text-rose-600 font-bold text-sm z-10 cursor-pointer">&times;</button>
+                <button type="button" class="absolute right-2 w-6 h-6 flex items-center justify-center text-slate-300 hover:text-rose-600 font-bold text-sm z-10 cursor-pointer" title="Eliminar atleta">&times;</button>
             `;
 
             const btnX = card.querySelector('button');
             const handleDelete = (e) => {
                 e.stopPropagation();
                 e.preventDefault();
-                callbackQuitar(p.key);
+                
+                // Mensaje de confirmación antes de eliminar al atleta
+                if (confirm(`¿Deseas eliminar al atleta #${p.num} ${p.name} del roster del partido?`)) {
+                    callbackQuitar(p.key);
+                }
             };
             btnX.onclick = handleDelete;
             btnX.ontouchend = handleDelete;
