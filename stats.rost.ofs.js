@@ -11,6 +11,9 @@ window.CVModuleRoster = (function() {
 
         if (!container) return;
 
+        // 💡 Ajustamos la altura máxima del contenedor en vertical para que entren más atletas visibles
+        container.className = "grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-h-96 overflow-y-auto p-1 pt-2";
+
         if (!Roster.length) {
             container.innerHTML = '<div class="col-span-full text-center py-4 text-xs text-slate-400 italic">No hay atletas en el roster del partido.</div>';
             return;
@@ -41,16 +44,20 @@ window.CVModuleRoster = (function() {
             card.onclick = handleSelect;
             card.ontouchend = handleSelect;
 
-            // Contenido organizado en 2 líneas:
-            // 1ª Línea: Número, Flecha de subir y Botón X de eliminar
+            // Contenido organizado:
+            // 1ª Línea: Número a la izquierda, Flecha EXACTAMENTE EN EL CENTRO, y X de eliminar a la derecha
             // 2ª Línea: Nombre completo centrado
             card.innerHTML = `
-                <div class="flex items-center justify-between w-full px-1">
-                    <span class="px-2 py-0.5 rounded-lg bg-blue-100 text-brand-electric font-black text-xs shrink-0">#${p.num}</span>
-                    <div class="flex items-center gap-1">
+                <div class="grid grid-cols-3 items-center w-full px-1">
+                    <div class="flex justify-start">
+                        <span class="px-2 py-0.5 rounded-lg bg-blue-100 text-brand-electric font-black text-xs shrink-0">#${p.num}</span>
+                    </div>
+                    <div class="flex justify-center">
                         <button type="button" class="btn-subir w-6 h-6 flex items-center justify-center text-slate-400 hover:text-brand-electric text-xs bg-slate-100 rounded-lg shrink-0 cursor-pointer" title="Subir de puesto">
                             <i class="fas fa-arrow-up"></i>
                         </button>
+                    </div>
+                    <div class="flex justify-end">
                         <button type="button" class="btn-eliminar w-6 h-6 flex items-center justify-center text-slate-300 hover:text-rose-600 text-sm shrink-0 cursor-pointer" title="Eliminar">&times;</button>
                     </div>
                 </div>
