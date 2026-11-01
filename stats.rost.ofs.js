@@ -11,7 +11,7 @@ window.CVModuleRoster = (function() {
 
         if (!container) return;
 
-        // 💡 Ajustamos la altura máxima del contenedor en vertical para que entren más atletas visibles
+        // Altura vertical amplia para ver más atletas
         container.className = "grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-h-96 overflow-y-auto p-1 pt-2";
 
         if (!Roster.length) {
@@ -21,22 +21,12 @@ window.CVModuleRoster = (function() {
 
         container.innerHTML = '';
 
-        // Aseguramos que tengan la propiedad de orden o posición si no la tienen
-        Roster.forEach((p, idx) => {
-            if (p.orden === undefined) p.orden = idx;
-        });
-
-        // Ordenamos el roster según su posición actual
-        Roster.sort((a, b) => a.orden - b.orden);
-
         Roster.forEach((p, index) => {
             const card = document.createElement('div');
             const isSelected = (atletaSeleccionadoKey === p.key);
             
-            // Estructura de tarjeta en dos líneas
             card.className = `relative p-2.5 rounded-2xl cursor-pointer flex flex-col items-center gap-1.5 card-atleta-item shadow-sm select-none touch-manipulation transition ${isSelected ? 'card-atleta-selected ring-2 ring-brand-electric bg-blue-50/80' : 'bg-white'}`;
             
-            // Selección normal al tocar la tarjeta
             const handleSelect = (e) => {
                 e.preventDefault();
                 callbackSeleccionar(p.key, p.num, p.name);
@@ -44,16 +34,13 @@ window.CVModuleRoster = (function() {
             card.onclick = handleSelect;
             card.ontouchend = handleSelect;
 
-            // Contenido organizado:
-            // 1ª Línea: Número a la izquierda, Flecha EXACTAMENTE EN EL CENTRO, y X de eliminar a la derecha
-            // 2ª Línea: Nombre completo centrado
             card.innerHTML = `
                 <div class="grid grid-cols-3 items-center w-full px-1">
                     <div class="flex justify-start">
                         <span class="px-2 py-0.5 rounded-lg bg-blue-100 text-brand-electric font-black text-xs shrink-0">#${p.num}</span>
                     </div>
                     <div class="flex justify-center">
-                        <button type="button" class="btn-subir w-6 h-6 flex items-center justify-center text-slate-400 hover:text-brand-electric text-xs bg-slate-100 rounded-lg shrink-0 cursor-pointer" title="Subir de puesto">
+                        <button type="button" class="btn-subir w-6 h-6 flex items-center justify-center text-slate-400 hover:text-brand-electric text-xs bg-slate-100 rounded-lg shrink-0 cursor-pointer" title="Subir al inicio">
                             <i class="fas fa-arrow-up"></i>
                         </button>
                     </div>
@@ -64,29 +51,39 @@ window.CVModuleRoster = (function() {
                 <div class="font-extrabold text-slate-900 text-xs text-center w-full px-1 break-words">${p.name}</div>
             `;
 
-            // Evento para SUBIR al jugador de posición
+            // Evento para SUBIR al jugador de posición de manera directa en el arreglo
             const btnSubir = card.querySelector('.btn-subir');
-            btnSubir.onclick = (e) => {
+            const handleSubir = (e) => {
                 e.stopPropagation();
                 e.preventDefault();
+                
                 if (index > 0) {
-                    const tempOrden = Roster[index].orden;
-                    Roster[index].orden = Roster[index - 1].orden;
-                    Roster[index - 1].orden = tempOrden;
+                    // Extraemos al atleta y lo movemos una posición hacia arriba (o directamente al inicio si prefieres)
+                    const atletaMovido = Roster.splice(index, 1)[0];
+                    Roster.splice(index - 1, 0, atletaMovido);
                     
-                    renderRosterCards(Roster, atletaSeleccionadoKey, callbackSeleccionar, callbackQuitar, callbackMoverPosicion);
+                    // Si el archivo coordinador provee un callback para guardar, lo ejecutamos, si no, re-renderizamos
+                    if (typeof callbackMoverPosicion === 'function') {
+                        callbackMoverPosicion(Roster);
+                    } else {
+                        renderRosterCards(Roster, atletaSeleccionadoKey, callbackSeleccionar, callbackQuitar, callbackMoverPosicion);
+                    }
                 }
             };
+            btnSubir.onclick = handleSubir;
+            btnSubir.ontouchend = handleSubir;
 
             // Evento para eliminar con confirmación
             const btnX = card.querySelector('.btn-eliminar');
-            btnX.onclick = (e) => {
+            const handleEliminar = (e) => {
                 e.stopPropagation();
                 e.preventDefault();
                 if (confirm(`¿Deseas eliminar al atleta #${p.num} ${p.name} del roster?`)) {
                     callbackQuitar(p.key);
                 }
             };
+            btnX.onclick = handleEliminar;
+            btnX.ontouchend = handleEliminar;
 
             container.appendChild(card);
         });
